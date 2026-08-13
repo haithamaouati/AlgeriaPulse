@@ -29,7 +29,23 @@
       copied: "Link copied to clipboard!",
       copy_failed: "Couldn't copy — select and copy manually.",
       need_input: "Pick a wilaya and write something first.",
-      shared_banner: "Viewing a shared pulse"
+      shared_banner: "Viewing a shared pulse",
+      about_title: "About Algeria Pulse",
+      about_lead: "Algeria Pulse is a lightweight, serverless way to turn a local idea, event, or breaking story into a link you can send anywhere — no account, no backend, no data storage.",
+      about_step1_title: "1. Pick a wilaya",
+      about_step1_body: "Choose your province from the dropdown or tap it directly on the interactive map.",
+      about_step2_title: "2. Write your pulse",
+      about_step2_body: "Type your idea, event, or news update in the text field, in Arabic or English.",
+      about_step3_title: "3. Get your link",
+      about_step3_body: "A unique link is generated instantly, encoding the timestamp, wilaya, and your message.",
+      about_step4_title: "4. Share it anywhere",
+      about_step4_body: "Copy or share the link through any app — Algeria Pulse never stores your content.",
+      feature_privacy: "100% client-side, zero server storage",
+      feature_bilingual: "Full Arabic / English support",
+      feature_theme: "Light & dark Green Forest theme",
+      feature_map: "Interactive 58-wilaya map",
+      ticker_loading: "Loading news…",
+      about_nav_aria: "About Algeria Pulse"
     },
     ar: {
       app_title: "نبض الجزائر",
@@ -37,7 +53,7 @@
       select_province: "اختر ولايتك",
       select_placeholder: "اختر ولاية…",
       notice_title: "قبل أن تنشر",
-      notice_body: "​يرجى العلم بأن القانون رقم 09-04 الصادر في 5 أغسطس 2009 ساري المفعول في الجزائر. وينص على عقوبات صارمة ضد أي محتوى منشور عبر الإنترنت قد يخلّ بالنظام العام أو ينتهك اللوائح المعمول بها. لتفادي أي تبعات قانونية، يُرجى الالتزام بأحكامه والامتناع عن نشر أي محتوى ضار، غير قانوني، أو محرض على العنف.",
+      notice_body: "يرجى العلم أن القانون رقم 09-04 المؤرخ في 5 أوت 2009 ساري المفعول في الجزائر. ينص هذا القانون على عقوبات صارمة ضد كل نشر إلكتروني من شأنه الإخلال بالنظام العام أو مخالفة الأنظمة المعمول بها. تجنبًا لأي تبعات قانونية، يرجى الالتزام بهذا التشريع والامتناع عن مشاركة محتوى ضار أو غير قانوني أو محرّض على العنف.",
       write_label: "فكرتك أو الحدث أو الخبر",
       write_placeholder: "ما الذي يحدث في ولايتك؟",
       metric_chars: "حرف",
@@ -54,7 +70,23 @@
       copied: "تم نسخ الرابط!",
       copy_failed: "تعذر النسخ — انسخ يدويًا.",
       need_input: "اختر ولاية واكتب شيئًا أولاً.",
-      shared_banner: "أنت تشاهد نبضة مشتركة"
+      shared_banner: "أنت تشاهد نبضة مشتركة",
+      about_title: "حول نبض الجزائر",
+      about_lead: "نبض الجزائر أداة خفيفة لا تعتمد على أي خادم، تُحوّل فكرة أو حدثًا أو خبرًا محليًا إلى رابط يمكنك إرساله إلى أي مكان — بدون حساب، بدون خادم خلفي، وبدون تخزين بيانات.",
+      about_step1_title: "١. اختر ولاية",
+      about_step1_body: "اختر ولايتك من القائمة المنسدلة أو اضغط عليها مباشرة على الخريطة التفاعلية.",
+      about_step2_title: "٢. اكتب نبضتك",
+      about_step2_body: "اكتب فكرتك أو الحدث أو الخبر في حقل النص، بالعربية أو الإنجليزية.",
+      about_step3_title: "٣. احصل على رابطك",
+      about_step3_body: "يتم إنشاء رابط فريد فورًا، يتضمن الوقت والولاية ورسالتك.",
+      about_step4_title: "٤. شاركه أينما شئت",
+      about_step4_body: "انسخ الرابط أو شاركه عبر أي تطبيق — نبض الجزائر لا يخزّن محتواك أبدًا.",
+      feature_privacy: "١٠٠٪ من جهة العميل، بدون تخزين على أي خادم",
+      feature_bilingual: "دعم كامل للغتين العربية والإنجليزية",
+      feature_theme: "وضع فاتح وداكن بطابع الغابة الخضراء",
+      feature_map: "خريطة تفاعلية لـ ٥٨ ولاية",
+      ticker_loading: "جارٍ تحميل الأخبار…",
+      about_nav_aria: "حول نبض الجزائر"
     }
   };
 
@@ -62,6 +94,7 @@
   let provinces = [];
   let provinceById = new Map();
   let currentProvinceId = null;
+  let newsItems = [];
   let svgRoot = null;
   let mapGroup = null;
   let viewBoxCenter = { x: 0, y: 0 };
@@ -91,6 +124,12 @@
       console.error("Failed to load algeria.svg", e);
     }
 
+    try {
+      await loadNews();
+    } catch (e) {
+      console.error("Failed to load news.json", e);
+    }
+
     applyLanguage(currentLang);
     hydrateFromURL();
   }
@@ -117,6 +156,12 @@
     els.copyBtn = $("#copyBtn");
     els.shareBtn = $("#shareBtn");
     els.copyHint = $("#copyHint");
+    els.copyHintText = $("#copyHintText");
+    els.aboutNavBtn = $("#aboutNavBtn");
+    els.aboutSection = $("#about");
+    els.tickerTrack = $("#tickerTrack");
+    els.scrollTopBtn = $("#scrollTopBtn");
+    els.scrollBottomBtn = $("#scrollBottomBtn");
   }
 
   /* ---------- Static event bindings ---------- */
@@ -146,6 +191,45 @@
 
     els.copyBtn.addEventListener("click", copyLink);
     els.shareBtn.addEventListener("click", shareLink);
+
+    els.aboutNavBtn.addEventListener("click", () => {
+      els.aboutSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    els.scrollBottomBtn.addEventListener("click", scrollStepDown);
+    els.scrollTopBtn.addEventListener("click", scrollStepUp);
+  }
+
+  /* ---------- Stepped multi-section scroll (floating icons) ---------- */
+  // Order the "down" sequence visits: dropdown -> text input -> map -> output -> about.
+  function getStepSections() {
+    return [
+      $("#provinceSection"),
+      $("#textSection"),
+      $("#mapSection"),
+      $("#outputSection"),
+      $("#about")
+    ].filter(Boolean);
+  }
+
+  let scrollDownIndex = 0;
+  let scrollUpIndex = 0;
+
+  function scrollStepDown() {
+    const sections = getStepSections();
+    if (!sections.length) return;
+    sections[scrollDownIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollDownIndex = Math.min(scrollDownIndex + 1, sections.length - 1);
+    scrollUpIndex = sections.length - 1 - scrollDownIndex;
+  }
+
+  function scrollStepUp() {
+    const sections = getStepSections();
+    if (!sections.length) return;
+    const reversed = sections.slice().reverse();
+    reversed[scrollUpIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollUpIndex = Math.min(scrollUpIndex + 1, reversed.length - 1);
+    scrollDownIndex = reversed.length - 1 - scrollUpIndex;
   }
 
   /* ---------- Theme ---------- */
@@ -173,10 +257,15 @@
       const key = node.getAttribute("data-i18n-placeholder");
       if (dict[key]) node.setAttribute("placeholder", dict[key]);
     });
+    document.querySelectorAll("[data-i18n-aria]").forEach((node) => {
+      const key = node.getAttribute("data-i18n-aria");
+      if (dict[key]) node.setAttribute("aria-label", dict[key]);
+    });
 
     populateSelect();
     updateProvinceDetails();
     updateClock();
+    renderTicker();
   }
 
   /* ---------- Live clock ---------- */
@@ -192,6 +281,45 @@
       hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
     }).format(now);
     els.liveClock.textContent = formatted;
+  }
+
+  /* ---------- News ticker ---------- */
+  async function loadNews() {
+    const res = await fetch("news.json");
+    const json = await res.json();
+    newsItems = Array.isArray(json.news) ? json.news : [];
+    renderTicker();
+    window.setInterval(renderTicker, 25000); // cycle to a new random order periodically
+  }
+
+  function shuffle(arr) {
+    const copy = arr.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function renderTicker() {
+    if (!els.tickerTrack) return;
+    if (!newsItems.length) {
+      els.tickerTrack.innerHTML = `<span class="ticker__item">${I18N[currentLang].ticker_loading}</span>`;
+      return;
+    }
+    const order = shuffle(newsItems);
+    const key = currentLang === "ar" ? "ar" : "en";
+    const html = order
+      .map((item) => `<span class="ticker__item">${escapeHtml(item[key] || item.en || "")}</span>`)
+      .join("");
+    // duplicate the sequence so the CSS marquee loop is seamless
+    els.tickerTrack.innerHTML = html + html;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
   }
 
   /* ---------- Data loading ---------- */
@@ -250,8 +378,44 @@
 
     svgRoot.addEventListener("click", (e) => {
       const path = e.target.closest("path[id]");
-      if (path) selectProvince(path.id, { fromMap: true });
+      if (path) {
+        playMapBeep();
+        selectProvince(path.id, { fromMap: true });
+      }
     });
+  }
+
+  /* ---------- Map click audio feedback (Web Audio API) ---------- */
+  let audioCtx = null;
+  function playMapBeep() {
+    try {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        audioCtx = new AudioContextClass();
+      }
+      if (audioCtx.state === "suspended") audioCtx.resume();
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(1320, now + 0.07);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.18, now + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.16);
+    } catch (e) {
+      /* audio not available — fail silently */
+    }
   }
 
   /* ---------- Province selection & map zoom ---------- */
@@ -261,6 +425,7 @@
 
     highlightPath(id);
     focusMapOn(id, currentProvinceId && currentProvinceId !== id);
+    addSensorRings(id);
     currentProvinceId = id;
 
     if (!opts.fromMap) {
@@ -309,6 +474,35 @@
     } else {
       doZoomIn();
     }
+  }
+
+  function addSensorRings(id) {
+    if (!svgRoot || !mapGroup) return;
+    const path = svgRoot.querySelector(`#${CSS.escape(id)}`);
+    if (!path) return;
+
+    const old = mapGroup.querySelector("#sensorPulse");
+    if (old) old.remove();
+
+    const bbox = path.getBBox();
+    const cx = bbox.x + bbox.width / 2;
+    const cy = bbox.y + bbox.height / 2;
+    const baseR = Math.max(bbox.width, bbox.height) / 2 || 10;
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const group = document.createElementNS(svgNS, "g");
+    group.setAttribute("id", "sensorPulse");
+
+    [1, 2, 3].forEach((n) => {
+      const circle = document.createElementNS(svgNS, "circle");
+      circle.setAttribute("cx", cx);
+      circle.setAttribute("cy", cy);
+      circle.setAttribute("r", baseR);
+      circle.setAttribute("class", `sensor-ring sensor-ring--${n}`);
+      group.appendChild(circle);
+    });
+
+    mapGroup.appendChild(group);
   }
 
   function resetMapView() {
@@ -424,9 +618,12 @@
   }
 
   function showHint(msg) {
-    els.copyHint.textContent = msg;
+    els.copyHintText.textContent = msg;
+    els.copyHint.classList.add("is-visible");
     window.clearTimeout(showHint._t);
-    showHint._t = window.setTimeout(() => (els.copyHint.textContent = ""), 2500);
+    showHint._t = window.setTimeout(() => {
+      els.copyHint.classList.remove("is-visible");
+    }, 2500);
   }
 
   /* ---------- Ambient particle background ---------- */
