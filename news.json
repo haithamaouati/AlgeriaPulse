@@ -1,0 +1,17 @@
+{
+  "news": [
+    { "en": "Sample: Municipal cleanup campaign launched across several wilayas.", "ar": "نموذج: انطلاق حملة نظافة بلدية عبر عدة ولايات." },
+    { "en": "Sample: New coastal road maintenance works announced.", "ar": "نموذج: الإعلان عن أشغال صيانة جديدة للطريق الساحلي." },
+    { "en": "Sample: Local cultural festival season begins this month.", "ar": "نموذج: انطلاق موسم المهرجانات الثقافية المحلية هذا الشهر." },
+    { "en": "Sample: Public transport schedule updated for several cities.", "ar": "نموذج: تحديث جدول النقل العمومي في عدة مدن." },
+    { "en": "Sample: Agricultural fair to open this weekend.", "ar": "نموذج: افتتاح المعرض الفلاحي نهاية هذا الأسبوع." },
+    { "en": "Sample: University enrollment period reminder issued.", "ar": "نموذج: تذكير بفترة التسجيلات الجامعية." },
+    { "en": "Sample: Weather advisory: mild temperatures expected this week.", "ar": "نموذج: نشرة جوية: درجات حرارة معتدلة متوقعة هذا الأسبوع." },
+    { "en": "Sample: New public park inaugurated in the city center.", "ar": "نموذج: افتتاح حديقة عمومية جديدة في وسط المدينة." },
+    { "en": "Sample: Local sports club advances to regional finals.", "ar": "نموذج: تأهل نادٍ رياضي محلي إلى النهائيات الجهوية." },
+    { "en": "Sample: Small business support program opens applications.", "ar": "نموذج: فتح باب الترشح لبرنامج دعم المؤسسات الصغيرة." },
+    { "en": "Sample: Road safety awareness campaign kicks off.", "ar": "نموذج: انطلاق حملة توعوية حول السلامة المرورية." },
+    { "en": "Sample: Renovation of a historic landmark nears completion.", "ar": "نموذج: اقتراب أشغال ترميم معلم تاريخي من نهايتها." }
+  ],
+  "note": "Placeholder sample headlines for ticker demo purposes only — replace with a real news feed for production use."
+}
