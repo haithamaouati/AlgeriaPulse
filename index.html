@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
 <title>Algeria Pulse — نبض الجزائر</title>
 <meta name="description" content="Share an idea, event, or breaking news from any of Algeria's 58 wilayas." />
+<link rel="icon" type="image/x-icon" href="icon.ico" />
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,7 +28,7 @@
   <header class="topbar glass">
     <div class="topbar__brand">
       <h1 class="topbar__title">
-        <i class="fa-solid fa-signal brand-icon" aria-hidden="true"></i>
+        <i class="fa-solid fa-tower-broadcast brand-icon brand-icon--pulse" aria-hidden="true"></i>
         <span data-i18n="app_title">Algeria Pulse</span>
       </h1>
       <p class="topbar__subtitle" data-i18n="app_subtitle">
@@ -42,12 +43,15 @@
       <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle dark mode">
         <i class="fa-solid fa-moon" id="themeIcon" aria-hidden="true"></i>
       </button>
-      <a class="icon-btn" href="https://t.me/" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
+      <a class="icon-btn" href="https://t.me/haithamaouati" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
         <i class="fa-brands fa-telegram" aria-hidden="true"></i>
       </a>
-      <a class="icon-btn" href="https://github.com/" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+      <a class="icon-btn" href="https://github.com/haithamaouati" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
         <i class="fa-brands fa-github" aria-hidden="true"></i>
       </a>
+      <button id="aboutNavBtn" class="icon-btn" type="button" aria-label="About Algeria Pulse" data-i18n-aria="about_nav_aria">
+        <i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i>
+      </button>
     </nav>
   </header>
 
@@ -57,11 +61,23 @@
     <span id="liveClock">—</span>
   </section>
 
+  <!-- ============ NEWS TICKER ============ -->
+  <section class="ticker glass" aria-label="News ticker">
+    <span class="ticker__badge">
+      <i class="fa-solid fa-satellite-dish" aria-hidden="true"></i>
+    </span>
+    <div class="ticker__viewport">
+      <div class="ticker__track" id="tickerTrack">
+        <span class="ticker__item" data-i18n="ticker_loading">Loading news…</span>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ WORKSPACE ============ -->
   <main class="workspace">
 
     <!-- Province selector -->
-    <section class="card glass">
+    <section class="card glass" id="provinceSection">
       <label class="card__label" for="provinceSelect" data-i18n="select_province">
         <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
         Select your wilaya
@@ -80,14 +96,13 @@
       </button>
       <div class="notice__body" id="noticeBody">
         <p data-i18n="notice_body">
-          Algeria Pulse generates a shareable link only — nothing is uploaded or stored on any server.
-          Do not share personal data, and please verify breaking news before spreading it further.
+          Please note that Law No. 09-04 of August 5, 2009, is in force in Algeria. This law stipulates strict sanctions against any online publication that may disturb public order or violate applicable regulations. To avoid any legal consequences, please comply with this legislation and refrain from sharing harmful, illegal, or violence-inciting content.
         </p>
       </div>
     </section>
 
     <!-- Text input -->
-    <section class="card glass">
+    <section class="card glass" id="textSection">
       <label class="card__label" for="pulseText" data-i18n="write_label">
         <i class="fa-solid fa-pen-nib" aria-hidden="true"></i>
         Your idea, event, or news
@@ -105,12 +120,13 @@
     </section>
 
     <!-- Interactive Map -->
-    <section class="card glass map-card">
+    <section class="card glass map-card" id="mapSection">
       <label class="card__label" data-i18n="map_label">
         <i class="fa-solid fa-map" aria-hidden="true"></i>
         Tap a wilaya on the map
       </label>
       <div class="map-wrap">
+        <div class="map-grid" aria-hidden="true"></div>
         <div id="mapContainer" class="map-container" role="group" aria-label="Map of Algeria"></div>
         <div class="map-controls">
           <button id="mapReset" class="icon-btn small" type="button" aria-label="Reset map view">
@@ -137,7 +153,7 @@
     </section>
 
     <!-- Output -->
-    <section class="card glass">
+    <section class="card glass" id="outputSection">
       <label class="card__label" for="outputLink" data-i18n="output_label">
         <i class="fa-solid fa-link" aria-hidden="true"></i>
         Shareable link
@@ -151,10 +167,70 @@
           <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
         </button>
       </div>
-      <p class="output-hint" id="copyHint" aria-live="polite"></p>
+      <p class="output-hint" id="copyHint" aria-live="polite">
+        <i class="fa-solid fa-circle-check output-hint__icon" id="copyHintIcon" aria-hidden="true"></i>
+        <span id="copyHintText"></span>
+      </p>
+
+      <p class="verse" dir="rtl" lang="ar">
+        قال تعالى: <span class="verse__ayah">﴿مَّا يَلْفِظُ مِن قَوْلٍ إِلَّا لَدَيْهِ رَقِيبٌ عَتِيدٌ﴾</span>
+        <span class="verse__ref">(سورة ق، الآية 18)</span>
+      </p>
     </section>
 
   </main>
+
+  <!-- ============ ABOUT / HOW IT WORKS ============ -->
+  <section class="about glass" id="about">
+    <h2 class="about__title" data-i18n="about_title">
+      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+      About Algeria Pulse
+    </h2>
+    <p class="about__lead" data-i18n="about_lead">
+      Algeria Pulse is a lightweight, serverless way to turn a local idea, event, or breaking
+      story into a link you can send anywhere — no account, no backend, no data storage.
+    </p>
+
+    <div class="about__grid">
+      <div class="about__item">
+        <i class="fa-solid fa-map-location-dot about__icon" aria-hidden="true"></i>
+        <div>
+          <h3 data-i18n="about_step1_title">1. Pick a wilaya</h3>
+          <p data-i18n="about_step1_body">Choose your province from the dropdown or tap it directly on the interactive map.</p>
+        </div>
+      </div>
+      <div class="about__item">
+        <i class="fa-solid fa-pen-nib about__icon" aria-hidden="true"></i>
+        <div>
+          <h3 data-i18n="about_step2_title">2. Write your pulse</h3>
+          <p data-i18n="about_step2_body">Type your idea, event, or news update in the text field, in Arabic or English.</p>
+        </div>
+      </div>
+      <div class="about__item">
+        <i class="fa-solid fa-link about__icon" aria-hidden="true"></i>
+        <div>
+          <h3 data-i18n="about_step3_title">3. Get your link</h3>
+          <p data-i18n="about_step3_body">A unique link is generated instantly, encoding the timestamp, wilaya, and your message.</p>
+        </div>
+      </div>
+      <div class="about__item">
+        <i class="fa-solid fa-share-nodes about__icon" aria-hidden="true"></i>
+        <div>
+          <h3 data-i18n="about_step4_title">4. Share it anywhere</h3>
+          <p data-i18n="about_step4_body">Copy or share the link through any app — Algeria Pulse never stores your content.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="about__features">
+      <span class="about__feature"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> <span data-i18n="feature_privacy">100% client-side, zero server storage</span></span>
+      <span class="about__feature"><i class="fa-solid fa-language" aria-hidden="true"></i> <span data-i18n="feature_bilingual">Full Arabic / English support</span></span>
+      <span class="about__feature"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i> <span data-i18n="feature_theme">Light & dark Green Forest theme</span></span>
+      <span class="about__feature"><i class="fa-solid fa-map" aria-hidden="true"></i> <span data-i18n="feature_map">Interactive 58-wilaya map</span></span>
+    </div>
+  </section>
+
+  <p class="version" id="versionTag">Version: 1.2.0</p>
 
   <!-- ============ FOOTER ============ -->
   <footer class="footer">
@@ -166,6 +242,16 @@
     </p>
   </footer>
 
+</div>
+
+<!-- ============ FLOATING SCROLL CONTROLS ============ -->
+<div class="scroll-fab-group" aria-hidden="false">
+  <button id="scrollTopBtn" class="scroll-fab" type="button" aria-label="Scroll up through sections">
+    <i class="fa-solid fa-angles-up" aria-hidden="true"></i>
+  </button>
+  <button id="scrollBottomBtn" class="scroll-fab" type="button" aria-label="Scroll down through sections">
+    <i class="fa-solid fa-angles-down" aria-hidden="true"></i>
+  </button>
 </div>
 
 <script src="script.js"></script>
