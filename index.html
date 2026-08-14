@@ -111,11 +111,10 @@
         data-i18n-placeholder="write_placeholder"
         placeholder="What's happening in your wilaya?"></textarea>
 
-      <!-- Metrics bar -->
-      <div class="metrics">
-        <span class="metric"><i class="fa-solid fa-font" aria-hidden="true"></i> <span id="charCount">0</span> <span data-i18n="metric_chars">chars</span></span>
-        <span class="metric"><i class="fa-solid fa-align-left" aria-hidden="true"></i> <span id="wordCount">0</span> <span data-i18n="metric_words">words</span></span>
-        <span class="metric"><i class="fa-solid fa-list-ol" aria-hidden="true"></i> <span id="lineCount">0</span> <span data-i18n="metric_lines">lines</span></span>
+      <!-- Identity bar: username + participation timestamp -->
+      <div class="metrics" id="identityBar">
+        <span class="metric"><i class="fa-solid fa-user" aria-hidden="true"></i> <span data-i18n="metric_user_label">User</span>: <span id="metricUsername">—</span></span>
+        <span class="metric"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i> <span data-i18n="metric_time_label">Participated</span>: <span id="metricTimestamp">—</span></span>
       </div>
     </section>
 
@@ -172,10 +171,21 @@
         <span id="copyHintText"></span>
       </p>
 
-      <p class="verse" dir="rtl" lang="ar">
-        قال تعالى: <span class="verse__ayah">﴿مَّا يَلْفِظُ مِن قَوْلٍ إِلَّا لَدَيْهِ رَقِيبٌ عَتِيدٌ﴾</span>
-        <span class="verse__ref">(سورة ق، الآية 18)</span>
-      </p>
+      <div class="verse-collapsible">
+        <button class="verse__toggle" id="verseToggle" type="button" aria-expanded="true" aria-controls="verseBody">
+          <span>
+            <i class="fa-solid fa-book-quran" aria-hidden="true"></i>
+            <span data-i18n="verse_title">A reminder</span>
+          </span>
+          <i class="fa-solid fa-chevron-down verse__chevron" aria-hidden="true"></i>
+        </button>
+        <div class="verse__body" id="verseBody">
+          <p class="verse" dir="rtl" lang="ar">
+            قال تعالى: <span class="verse__ayah">﴿مَّا يَلْفِظُ مِن قَوْلٍ إِلَّا لَدَيْهِ رَقِيبٌ عَتِيدٌ﴾</span>
+            <span class="verse__ref">(سورة ق، الآية 18)</span>
+          </p>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -242,6 +252,19 @@
     </p>
   </footer>
 
+</div>
+
+<!-- ============ USERNAME PROMPT MODAL ============ -->
+<div class="modal-overlay" id="usernameModal" role="dialog" aria-modal="true" aria-labelledby="usernameModalTitle" hidden>
+  <div class="modal-card glass">
+    <i class="fa-solid fa-user-pen modal-icon" aria-hidden="true"></i>
+    <h2 id="usernameModalTitle" data-i18n="modal_title">What should we call you?</h2>
+    <p class="modal-sub" data-i18n="modal_sub">Your name is included in the link you generate.</p>
+    <form id="usernameForm" autocomplete="off">
+      <input id="usernameInput" type="text" maxlength="24" data-i18n-placeholder="modal_placeholder" placeholder="Enter a username…" required />
+      <button type="submit" class="modal-submit" id="usernameSubmit" data-i18n="modal_submit">Continue</button>
+    </form>
+  </div>
 </div>
 
 <!-- ============ FLOATING SCROLL CONTROLS ============ -->
