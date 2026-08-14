@@ -15,9 +15,6 @@
       notice_body: "Please note that Law No. 09-04 of August 5, 2009, is in force in Algeria. This law stipulates strict sanctions against any online publication that may disturb public order or violate applicable regulations. To avoid any legal consequences, please comply with this legislation and refrain from sharing harmful, illegal, or violence-inciting content.",
       write_label: "Your idea, event, or news",
       write_placeholder: "What's happening in your wilaya?",
-      metric_chars: "chars",
-      metric_words: "words",
-      metric_lines: "lines",
       map_label: "Tap a wilaya on the map",
       detail_id: "ID",
       detail_en: "Name (EN)",
@@ -45,7 +42,16 @@
       feature_theme: "Light & dark Green Forest theme",
       feature_map: "Interactive 58-wilaya map",
       ticker_loading: "Loading news…",
-      about_nav_aria: "About Algeria Pulse"
+      about_nav_aria: "About Algeria Pulse",
+      verse_title: "A reminder",
+      metric_user_label: "User",
+      metric_time_label: "Participated",
+      metric_no_user: "—",
+      modal_title: "What should we call you?",
+      modal_sub: "Your name is included in the link you generate.",
+      modal_placeholder: "Enter a username…",
+      modal_submit: "Continue",
+      modal_error: "Please enter at least 2 characters."
     },
     ar: {
       app_title: "نبض الجزائر",
@@ -56,9 +62,6 @@
       notice_body: "يرجى العلم أن القانون رقم 09-04 المؤرخ في 5 أوت 2009 ساري المفعول في الجزائر. ينص هذا القانون على عقوبات صارمة ضد كل نشر إلكتروني من شأنه الإخلال بالنظام العام أو مخالفة الأنظمة المعمول بها. تجنبًا لأي تبعات قانونية، يرجى الالتزام بهذا التشريع والامتناع عن مشاركة محتوى ضار أو غير قانوني أو محرّض على العنف.",
       write_label: "فكرتك أو الحدث أو الخبر",
       write_placeholder: "ما الذي يحدث في ولايتك؟",
-      metric_chars: "حرف",
-      metric_words: "كلمة",
-      metric_lines: "سطر",
       map_label: "اضغط على ولاية في الخريطة",
       detail_id: "الرمز",
       detail_en: "الاسم (EN)",
@@ -86,7 +89,16 @@
       feature_theme: "وضع فاتح وداكن بطابع الغابة الخضراء",
       feature_map: "خريطة تفاعلية لـ ٥٨ ولاية",
       ticker_loading: "جارٍ تحميل الأخبار…",
-      about_nav_aria: "حول نبض الجزائر"
+      about_nav_aria: "حول نبض الجزائر",
+      verse_title: "تذكير",
+      metric_user_label: "المستخدم",
+      metric_time_label: "وقت المشاركة",
+      metric_no_user: "—",
+      modal_title: "بماذا نناديك؟",
+      modal_sub: "يُدرج اسمك ضمن الرابط الذي تنشئه.",
+      modal_placeholder: "أدخل اسم المستخدم…",
+      modal_submit: "متابعة",
+      modal_error: "الرجاء إدخال حرفين على الأقل."
     }
   };
 
@@ -95,6 +107,8 @@
   let provinceById = new Map();
   let currentProvinceId = null;
   let newsItems = [];
+  let username = null;
+  let participationTimestamp = null;
   let svgRoot = null;
   let mapGroup = null;
   let viewBoxCenter = { x: 0, y: 0 };
@@ -108,6 +122,7 @@
   async function init() {
     cacheElements();
     bindStaticEvents();
+    applyContentProtections();
     startClock();
     initParticles();
 
@@ -132,6 +147,7 @@
 
     applyLanguage(currentLang);
     hydrateFromURL();
+    resolveIdentity();
   }
 
   function cacheElements() {
@@ -143,10 +159,11 @@
     els.provinceSelect = $("#provinceSelect");
     els.noticeToggle = $("#noticeToggle");
     els.noticeBody = $("#noticeBody");
+    els.verseToggle = $("#verseToggle");
+    els.verseBody = $("#verseBody");
     els.pulseText = $("#pulseText");
-    els.charCount = $("#charCount");
-    els.wordCount = $("#wordCount");
-    els.lineCount = $("#lineCount");
+    els.metricUsername = $("#metricUsername");
+    els.metricTimestamp = $("#metricTimestamp");
     els.mapContainer = $("#mapContainer");
     els.mapReset = $("#mapReset");
     els.detailId = $("#detailId");
@@ -162,6 +179,9 @@
     els.tickerTrack = $("#tickerTrack");
     els.scrollTopBtn = $("#scrollTopBtn");
     els.scrollBottomBtn = $("#scrollBottomBtn");
+    els.usernameModal = $("#usernameModal");
+    els.usernameForm = $("#usernameForm");
+    els.usernameInput = $("#usernameInput");
   }
 
   /* ---------- Static event bindings ---------- */
@@ -178,12 +198,33 @@
       els.noticeBody.classList.toggle("collapsed", expanded);
     });
 
+    els.verseToggle.addEventListener("click", () => {
+      const expanded = els.verseToggle.getAttribute("aria-expanded") === "true";
+      els.verseToggle.setAttribute("aria-expanded", String(!expanded));
+      els.verseBody.classList.toggle("collapsed", expanded);
+    });
+
+    els.usernameForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const dict = I18N[currentLang];
+      const val = els.usernameInput.value.trim();
+      if (val.length < 2) {
+        els.usernameInput.setCustomValidity(dict.modal_error);
+        els.usernameInput.reportValidity();
+        return;
+      }
+      els.usernameInput.setCustomValidity("");
+      username = val;
+      if (!participationTimestamp) participationTimestamp = Date.now();
+      hideUsernameModal();
+      finalizeIdentity();
+    });
+
     els.provinceSelect.addEventListener("change", (e) => {
       if (e.target.value) selectProvince(e.target.value, { fromMap: false });
     });
 
     els.pulseText.addEventListener("input", () => {
-      updateMetrics();
       generateLink();
     });
 
@@ -232,6 +273,48 @@
     scrollDownIndex = reversed.length - 1 - scrollUpIndex;
   }
 
+  /* ---------- Content protection (soft client-side deterrents) ----------
+     These only discourage casual copying/inspection — they cannot truly
+     block a determined user or the browser's built-in dev tools. Form
+     fields (input/textarea) stay selectable so the app remains usable. */
+  function applyContentProtections() {
+    const isFormField = (el) => {
+      const tag = (el && el.tagName || "").toLowerCase();
+      return tag === "input" || tag === "textarea";
+    };
+
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+    document.addEventListener("selectstart", (e) => {
+      if (isFormField(e.target)) return;
+      e.preventDefault();
+    });
+
+    document.addEventListener("copy", (e) => {
+      if (isFormField(e.target)) return;
+      e.preventDefault();
+    });
+
+    document.addEventListener("cut", (e) => {
+      if (isFormField(e.target)) return;
+      e.preventDefault();
+    });
+
+    document.addEventListener("dragstart", (e) => e.preventDefault());
+
+    document.addEventListener("keydown", (e) => {
+      const key = e.key;
+      const isDevToolsCombo =
+        key === "F12" ||
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && ["I", "J", "C", "i", "j", "c"].includes(key)) ||
+        ((e.ctrlKey || e.metaKey) && ["U", "u", "S", "s"].includes(key));
+      if (isDevToolsCombo) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+  }
+
   /* ---------- Theme ---------- */
   function toggleTheme() {
     const root = document.documentElement;
@@ -265,7 +348,59 @@
     populateSelect();
     updateProvinceDetails();
     updateClock();
+    updateIdentityDisplay();
     renderTicker();
+  }
+
+  /* ---------- Username identity (prompt modal + shared-link hydration) ---------- */
+  function resolveIdentity() {
+    const params = new URLSearchParams(window.location.search);
+    const uParam = params.get("u");
+    const tParam = params.get("t");
+
+    // A visited shareable link carries its own participation timestamp —
+    // extract and keep it rather than generating a new one.
+    if (tParam) participationTimestamp = Number(tParam);
+
+    // The modal always appears on load (per spec); if the link already
+    // carries a username, prefill it as a courtesy so returning users can
+    // simply confirm instead of retyping.
+    if (uParam && els.usernameInput) {
+      els.usernameInput.value = decodeURIComponent(uParam);
+    }
+    showUsernameModal();
+  }
+
+  function finalizeIdentity() {
+    updateIdentityDisplay();
+    generateLink();
+  }
+
+  function showUsernameModal() {
+    els.usernameModal.hidden = false;
+    window.setTimeout(() => els.usernameInput.focus(), 60);
+  }
+
+  function hideUsernameModal() {
+    els.usernameModal.hidden = true;
+  }
+
+  function updateIdentityDisplay() {
+    const dict = I18N[currentLang];
+    if (els.metricUsername) {
+      els.metricUsername.textContent = username || dict.metric_no_user;
+    }
+    if (els.metricTimestamp) {
+      if (participationTimestamp) {
+        const locale = currentLang === "ar" ? "ar-DZ" : "en-GB";
+        els.metricTimestamp.textContent = new Intl.DateTimeFormat(locale, {
+          year: "numeric", month: "short", day: "numeric",
+          hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+        }).format(new Date(participationTimestamp));
+      } else {
+        els.metricTimestamp.textContent = dict.metric_no_user;
+      }
+    }
   }
 
   /* ---------- Live clock ---------- */
@@ -519,16 +654,6 @@
     void dict;
   }
 
-  /* ---------- Text metrics ---------- */
-  function updateMetrics() {
-    const val = els.pulseText.value;
-    els.charCount.textContent = val.length;
-    const words = val.trim().length ? val.trim().split(/\s+/).length : 0;
-    els.wordCount.textContent = words;
-    const lines = val.length ? val.split(/\n/).length : 0;
-    els.lineCount.textContent = lines;
-  }
-
   /* ---------- Link generation ---------- */
   function b64EncodeUnicode(str) {
     return btoa(
@@ -548,14 +673,15 @@
 
   function generateLink() {
     const text = els.pulseText.value.trim();
-    if (!currentProvinceId || !text) {
+    if (!currentProvinceId || !text || !username) {
       els.outputLink.value = "";
       return;
     }
     const url = new URL(window.location.href);
     url.search = "";
     url.hash = "";
-    url.searchParams.set("t", Date.now().toString());
+    url.searchParams.set("u", username);
+    url.searchParams.set("t", (participationTimestamp || Date.now()).toString());
     url.searchParams.set("p", currentProvinceId);
     url.searchParams.set("d", b64EncodeUnicode(text));
     els.outputLink.value = url.toString();
@@ -571,8 +697,6 @@
     if (d) {
       try {
         els.pulseText.value = b64DecodeUnicode(d);
-        updateMetrics();
-        generateLink();
       } catch (e) {
         console.warn("Could not decode shared text", e);
       }
