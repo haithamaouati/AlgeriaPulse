@@ -462,6 +462,28 @@ body::after {
 .metric i { color: var(--primary-light); }
 .metric span#metricUsername, .metric span#metricTimestamp { color: var(--text); }
 
+.edit-username-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-inline-start: 4px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--primary-light);
+  font-size: 0.7rem;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.edit-username-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: scale(1.1);
+}
+
 /* Map */
 .map-card { padding-bottom: 20px; }
 .map-wrap {
@@ -603,64 +625,6 @@ body::after {
 }
 .output-hint.is-visible { opacity: 1; }
 .output-hint__icon { color: #2E6F40; }
-
-.verse-collapsible {
-  margin-top: 14px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  border-inline-start: 3px solid var(--primary-light);
-  background: var(--input-bg);
-}
-.verse__toggle {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: transparent;
-  border: none;
-  padding: 12px 16px;
-  cursor: pointer;
-  font-family: var(--font);
-  font-weight: 700;
-  font-size: 0.88rem;
-  color: var(--text);
-}
-.verse__toggle i.fa-book-quran { color: var(--primary-light); margin-inline-end: 8px; }
-.verse__chevron { transition: transform 0.3s ease; color: var(--text-muted); }
-.verse__toggle[aria-expanded="false"] .verse__chevron { transform: rotate(-90deg); }
-[dir="rtl"] .verse__toggle[aria-expanded="false"] .verse__chevron { transform: rotate(90deg); }
-
-.verse__body {
-  display: grid;
-  grid-template-rows: 1fr;
-  transition: grid-template-rows 0.3s ease, opacity 0.3s ease;
-}
-.verse__body > .verse { margin: 0 16px 14px; overflow: hidden; }
-.verse__body.collapsed {
-  grid-template-rows: 0fr;
-  opacity: 0;
-}
-.verse__body.collapsed > .verse { margin-top: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; min-height: 0; }
-
-.verse {
-  margin: 14px 0 0;
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  font-size: 0.88rem;
-  line-height: 1.9;
-  color: var(--text-muted);
-  text-align: center;
-}
-.verse__ayah {
-  color: var(--primary-light);
-  font-weight: 700;
-}
-.verse__ref {
-  display: inline-block;
-  margin-inline-start: 6px;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
 
 /* ============ ABOUT / FEATURES ============ */
 .about {
