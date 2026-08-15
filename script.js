@@ -43,7 +43,6 @@
       feature_map: "Interactive 58-wilaya map",
       ticker_loading: "Loading news…",
       about_nav_aria: "About Algeria Pulse",
-      verse_title: "A reminder",
       metric_user_label: "User",
       metric_time_label: "Participated",
       metric_no_user: "—",
@@ -51,7 +50,10 @@
       modal_sub: "Your name is included in the link you generate.",
       modal_placeholder: "Enter a username…",
       modal_submit: "Continue",
-      modal_error: "Please enter at least 2 characters."
+      modal_error: "Please enter at least 2 characters.",
+      modal_title_edit: "Update your username",
+      modal_sub_edit: "This changes the name used in links you generate from now on.",
+      edit_username_aria: "Edit username"
     },
     ar: {
       app_title: "نبض الجزائر",
@@ -90,7 +92,6 @@
       feature_map: "خريطة تفاعلية لـ ٥٨ ولاية",
       ticker_loading: "جارٍ تحميل الأخبار…",
       about_nav_aria: "حول نبض الجزائر",
-      verse_title: "تذكير",
       metric_user_label: "المستخدم",
       metric_time_label: "وقت المشاركة",
       metric_no_user: "—",
@@ -98,7 +99,10 @@
       modal_sub: "يُدرج اسمك ضمن الرابط الذي تنشئه.",
       modal_placeholder: "أدخل اسم المستخدم…",
       modal_submit: "متابعة",
-      modal_error: "الرجاء إدخال حرفين على الأقل."
+      modal_error: "الرجاء إدخال حرفين على الأقل.",
+      modal_title_edit: "تحديث اسم المستخدم",
+      modal_sub_edit: "سيُستخدم هذا الاسم في الروابط التي تنشئها من الآن فصاعدًا.",
+      edit_username_aria: "تعديل اسم المستخدم"
     }
   };
 
@@ -159,8 +163,6 @@
     els.provinceSelect = $("#provinceSelect");
     els.noticeToggle = $("#noticeToggle");
     els.noticeBody = $("#noticeBody");
-    els.verseToggle = $("#verseToggle");
-    els.verseBody = $("#verseBody");
     els.pulseText = $("#pulseText");
     els.metricUsername = $("#metricUsername");
     els.metricTimestamp = $("#metricTimestamp");
@@ -182,6 +184,9 @@
     els.usernameModal = $("#usernameModal");
     els.usernameForm = $("#usernameForm");
     els.usernameInput = $("#usernameInput");
+    els.usernameModalTitle = $("#usernameModalTitle");
+    els.usernameModalSub = $("#usernameModalSub");
+    els.editUsernameBtn = $("#editUsernameBtn");
   }
 
   /* ---------- Static event bindings ---------- */
@@ -196,12 +201,6 @@
       const expanded = els.noticeToggle.getAttribute("aria-expanded") === "true";
       els.noticeToggle.setAttribute("aria-expanded", String(!expanded));
       els.noticeBody.classList.toggle("collapsed", expanded);
-    });
-
-    els.verseToggle.addEventListener("click", () => {
-      const expanded = els.verseToggle.getAttribute("aria-expanded") === "true";
-      els.verseToggle.setAttribute("aria-expanded", String(!expanded));
-      els.verseBody.classList.toggle("collapsed", expanded);
     });
 
     els.usernameForm.addEventListener("submit", (e) => {
@@ -220,8 +219,15 @@
       finalizeIdentity();
     });
 
+    els.editUsernameBtn.addEventListener("click", () => {
+      showUsernameModal({ editing: true });
+    });
+
     els.provinceSelect.addEventListener("change", (e) => {
-      if (e.target.value) selectProvince(e.target.value, { fromMap: false });
+      if (e.target.value) {
+        playMapBeep();
+        selectProvince(e.target.value, { fromMap: false });
+      }
     });
 
     els.pulseText.addEventListener("input", () => {
@@ -242,14 +248,26 @@
   }
 
   /* ---------- Stepped multi-section scroll (floating icons) ---------- */
-  // Order the "down" sequence visits: dropdown -> text input -> map -> output -> about.
-  function getStepSections() {
+  // Down sequence (6 stops): dropdown -> text input -> map -> output -> about -> footer.
+  function getDownSteps() {
     return [
       $("#provinceSection"),
       $("#textSection"),
       $("#mapSection"),
       $("#outputSection"),
-      $("#about")
+      $("#about"),
+      $("#footerSection")
+    ].filter(Boolean);
+  }
+
+  // Up sequence (5 sections, then a 6th step that goes to the very top of the page).
+  function getUpSteps() {
+    return [
+      $("#footerSection"),
+      $("#about"),
+      $("#outputSection"),
+      $("#mapSection"),
+      $("#textSection")
     ].filter(Boolean);
   }
 
@@ -257,20 +275,21 @@
   let scrollUpIndex = 0;
 
   function scrollStepDown() {
-    const sections = getStepSections();
-    if (!sections.length) return;
-    sections[scrollDownIndex].scrollIntoView({ behavior: "smooth", block: "start" });
-    scrollDownIndex = Math.min(scrollDownIndex + 1, sections.length - 1);
-    scrollUpIndex = sections.length - 1 - scrollDownIndex;
+    const steps = getDownSteps();
+    if (!steps.length) return;
+    steps[scrollDownIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollDownIndex = Math.min(scrollDownIndex + 1, steps.length - 1);
   }
 
   function scrollStepUp() {
-    const sections = getStepSections();
-    if (!sections.length) return;
-    const reversed = sections.slice().reverse();
-    reversed[scrollUpIndex].scrollIntoView({ behavior: "smooth", block: "start" });
-    scrollUpIndex = Math.min(scrollUpIndex + 1, reversed.length - 1);
-    scrollDownIndex = reversed.length - 1 - scrollUpIndex;
+    const steps = getUpSteps();
+    if (scrollUpIndex < steps.length) {
+      steps[scrollUpIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollUpIndex = Math.min(scrollUpIndex + 1, steps.length);
+    } else {
+      // Final (6th) stop: the very top of the page (main header title).
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 
   /* ---------- Content protection (soft client-side deterrents) ----------
@@ -350,6 +369,15 @@
     updateClock();
     updateIdentityDisplay();
     renderTicker();
+    refreshUsernameModalCopy();
+  }
+
+  function refreshUsernameModalCopy() {
+    if (!els.usernameModal || els.usernameModal.hidden) return;
+    const dict = I18N[currentLang];
+    const editing = els.usernameModal.dataset.mode === "edit";
+    if (els.usernameModalTitle) els.usernameModalTitle.textContent = editing ? dict.modal_title_edit : dict.modal_title;
+    if (els.usernameModalSub) els.usernameModalSub.textContent = editing ? dict.modal_sub_edit : dict.modal_sub;
   }
 
   /* ---------- Username identity (prompt modal + shared-link hydration) ---------- */
@@ -376,9 +404,26 @@
     generateLink();
   }
 
-  function showUsernameModal() {
+  function showUsernameModal(opts = {}) {
+    const dict = I18N[currentLang];
+    const editing = !!opts.editing;
+
     els.usernameModal.hidden = false;
-    window.setTimeout(() => els.usernameInput.focus(), 60);
+    els.usernameModal.dataset.mode = editing ? "edit" : "create";
+
+    if (editing) {
+      els.usernameInput.value = username || "";
+      if (els.usernameModalTitle) els.usernameModalTitle.textContent = dict.modal_title_edit;
+      if (els.usernameModalSub) els.usernameModalSub.textContent = dict.modal_sub_edit;
+    } else {
+      if (els.usernameModalTitle) els.usernameModalTitle.textContent = dict.modal_title;
+      if (els.usernameModalSub) els.usernameModalSub.textContent = dict.modal_sub;
+    }
+
+    window.setTimeout(() => {
+      els.usernameInput.focus();
+      els.usernameInput.select();
+    }, 60);
   }
 
   function hideUsernameModal() {
