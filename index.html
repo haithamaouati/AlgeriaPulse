@@ -87,14 +87,14 @@
 
     <!-- Warning notice (collapsible) -->
     <section class="notice glass">
-      <button class="notice__toggle" id="noticeToggle" type="button" aria-expanded="true" aria-controls="noticeBody">
+      <button class="notice__toggle" id="noticeToggle" type="button" aria-expanded="false" aria-controls="noticeBody">
         <span>
           <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
           <span data-i18n="notice_title">Before you post</span>
         </span>
         <i class="fa-solid fa-chevron-down notice__chevron" aria-hidden="true"></i>
       </button>
-      <div class="notice__body" id="noticeBody">
+      <div class="notice__body collapsed" id="noticeBody">
         <p data-i18n="notice_body">
           Please note that Law No. 09-04 of August 5, 2009, is in force in Algeria. This law stipulates strict sanctions against any online publication that may disturb public order or violate applicable regulations. To avoid any legal consequences, please comply with this legislation and refrain from sharing harmful, illegal, or violence-inciting content.
         </p>
@@ -113,7 +113,13 @@
 
       <!-- Identity bar: username + participation timestamp -->
       <div class="metrics" id="identityBar">
-        <span class="metric"><i class="fa-solid fa-user" aria-hidden="true"></i> <span data-i18n="metric_user_label">User</span>: <span id="metricUsername">—</span></span>
+        <span class="metric">
+          <i class="fa-solid fa-user" aria-hidden="true"></i>
+          <span data-i18n="metric_user_label">User</span>: <span id="metricUsername">—</span>
+          <button id="editUsernameBtn" class="edit-username-btn" type="button" aria-label="Edit username" data-i18n-aria="edit_username_aria">
+            <i class="fa-solid fa-pen" aria-hidden="true"></i>
+          </button>
+        </span>
         <span class="metric"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i> <span data-i18n="metric_time_label">Participated</span>: <span id="metricTimestamp">—</span></span>
       </div>
     </section>
@@ -170,22 +176,6 @@
         <i class="fa-solid fa-circle-check output-hint__icon" id="copyHintIcon" aria-hidden="true"></i>
         <span id="copyHintText"></span>
       </p>
-
-      <div class="verse-collapsible">
-        <button class="verse__toggle" id="verseToggle" type="button" aria-expanded="true" aria-controls="verseBody">
-          <span>
-            <i class="fa-solid fa-book-quran" aria-hidden="true"></i>
-            <span data-i18n="verse_title">A reminder</span>
-          </span>
-          <i class="fa-solid fa-chevron-down verse__chevron" aria-hidden="true"></i>
-        </button>
-        <div class="verse__body" id="verseBody">
-          <p class="verse" dir="rtl" lang="ar">
-            قال تعالى: <span class="verse__ayah">﴿مَّا يَلْفِظُ مِن قَوْلٍ إِلَّا لَدَيْهِ رَقِيبٌ عَتِيدٌ﴾</span>
-            <span class="verse__ref">(سورة ق، الآية 18)</span>
-          </p>
-        </div>
-      </div>
     </section>
 
   </main>
@@ -240,10 +230,10 @@
     </div>
   </section>
 
-  <p class="version" id="versionTag">Version: 1.2.0</p>
+  <p class="version" id="versionTag">Version: 1.3.0</p>
 
   <!-- ============ FOOTER ============ -->
-  <footer class="footer">
+  <footer class="footer" id="footerSection">
     <p>
       <span data-i18n="footer_developed">Developed with</span>
       <i class="fa-solid fa-heart footer__heart" aria-hidden="true"></i>
@@ -259,7 +249,7 @@
   <div class="modal-card glass">
     <i class="fa-solid fa-user-pen modal-icon" aria-hidden="true"></i>
     <h2 id="usernameModalTitle" data-i18n="modal_title">What should we call you?</h2>
-    <p class="modal-sub" data-i18n="modal_sub">Your name is included in the link you generate.</p>
+    <p class="modal-sub" id="usernameModalSub" data-i18n="modal_sub">Your name is included in the link you generate.</p>
     <form id="usernameForm" autocomplete="off">
       <input id="usernameInput" type="text" maxlength="24" data-i18n-placeholder="modal_placeholder" placeholder="Enter a username…" required />
       <button type="submit" class="modal-submit" id="usernameSubmit" data-i18n="modal_submit">Continue</button>
