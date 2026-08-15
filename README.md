@@ -4,7 +4,7 @@ A lightweight, fully client-side web app for sharing an idea, event, or breaking
 news item tied to any of Algeria's **58 wilayas (provinces)** — as a single
 shareable link. No backend, no accounts, no server-side storage.
 
-![version](https://img.shields.io/badge/version-1.2.0-2E6F40) ![license](https://img.shields.io/badge/license-MIT-4C956C)
+![version](https://img.shields.io/badge/version-1.3.0-2E6F40) ![license](https://img.shields.io/badge/license-MIT-4C956C)
 
 ---
 
@@ -13,7 +13,8 @@ shareable link. No backend, no accounts, no server-side storage.
 - **58-wilaya interactive SVG map** — click any province to smoothly zoom/pan
   into it, with an animated radar-style "sensor pulse" ring emitted from the
   selected wilaya, a subtle grid overlay on the map surface, and a crisp
-  **audio beep** (generated live via the Web Audio API) confirming every tap.
+  **audio beep** (generated live via the Web Audio API) confirming every tap
+  — on the map itself, or when picking a wilaya from the dropdown.
 - **Province dropdown** — synced two-way with the map; populated from `data.json`.
 - **Bilingual UI (English / Arabic)** — one-click language toggle that swaps all
   copy, flips the layout direction (LTR ⇄ RTL), and swaps the wilaya name order.
@@ -25,25 +26,25 @@ shareable link. No backend, no accounts, no server-side storage.
   `news.json`, reshuffling periodically.
 - **Username prompt on load** — a themed modal asks for a display name before
   the app is used; the name is woven into every generated link and shown in
-  the identity bar (see [Username & participation identity](#-username--participation-identity)).
+  the identity bar. It's **editable at any time** afterwards via a small pencil
+  icon next to your name (see [Username & participation identity](#-username--participation-identity)).
 - **Identity bar** — below the text field, replacing the old character/word/line
-  counters, showing the current **username** and the **participation
-  timestamp** (freshly generated, or extracted straight from a visited
-  shareable link).
+  counters, showing the current **username** (with an inline edit control) and
+  the **participation timestamp** (freshly generated, or extracted straight
+  from a visited shareable link).
 - **Instant shareable link generation** — every link encodes the username,
   a participation timestamp, the wilaya ID, and your message (Base64, UTF‑8
   safe) as URL query parameters — no server round-trip required.
 - **Copy & native Share** — one-tap clipboard copy, or the Web Share API on
   supported devices/browsers.
-- **Collapsible Qur'anic reminder** — a `book-quran`-icon panel directly below
-  the generated link, collapsed/expanded the same way as the legal notice.
-- **Legal notice** — a collapsible "Before you post" panel referencing
-  Algeria's Law No. 09‑04 (5 August 2009) on electronic publishing conduct.
+- **Legal notice** — a collapsible "Before you post" panel (collapsed by
+  default) referencing Algeria's Law No. 09‑04 (5 August 2009) on electronic
+  publishing conduct.
 - **About / How it works section** — an in-page explainer reachable via the
   header's `tower-broadcast` info icon (smooth-scrolls down) or the floating
   scroll controls.
 - **Stepped floating scroll navigation** — the floating down/up icons walk
-  through the page's key sections one at a time instead of jumping straight
+  through six stops across the page one at a time instead of jumping straight
   to the top or bottom (see [Stepped scroll navigation](#-stepped-scroll-navigation)).
 - **Content-protection deterrents** — page-wide text selection, right-click,
   and common dev-tools shortcuts are soft-blocked (see [Content protection](#-content-protection)).
@@ -109,7 +110,8 @@ Then open `http://localhost:8080` in your browser.
 - Selecting a province:
   1. Plays a short, clean **beep** (Web Audio API — a sine oscillator with a
      fast attack/decay gain envelope, no audio files or external assets)
-     whenever a wilaya is clicked directly on the map.
+     whenever a wilaya is chosen — either clicked directly on the map, or
+     picked from the `<select>` dropdown.
   2. Highlights the corresponding `<path>` (`.selected` class).
   3. If another province was already focused, the view first **zooms out**
      to the full map, then **zooms/pans in** on the new selection (two-stage
@@ -119,8 +121,8 @@ Then open `http://localhost:8080` in your browser.
      centered on the province's bounding-box centroid, animated purely in CSS
      (`@keyframes sensorPulse`).
 - Clicking the map and choosing from the `<select>` are kept in sync through
-  a shared `selectProvince(id)` function. The audio beep only fires for
-  direct map clicks, not for dropdown selections.
+  a shared `selectProvince(id)` function; both trigger the same `playMapBeep()`
+  audio cue.
 
 ### 3. Link generation
 ```
@@ -158,6 +160,13 @@ Then open `http://localhost:8080` in your browser.
   a fresh `Date.now()` participation timestamp is only stamped if one wasn't
   already extracted from the URL. Nothing is persisted to
   `localStorage`/cookies — refreshing the page shows the modal again.
+- **The username is editable at any time.** A small pencil icon
+  (`#editUsernameBtn`, `fa-pen`) sits next to the name in the identity bar;
+  clicking it reopens the same modal in an "edit" mode — copy switches to
+  "Update your username", the field is prefilled with the current name, and
+  submitting only updates `username` (the existing `participationTimestamp`
+  is left untouched, so re-editing your name doesn't reset your session's
+  participation time).
 - The identity bar (`#metricUsername`, `#metricTimestamp`, under the text
   field) mirrors this state and re-formats the timestamp for the active
   language/locale whenever the UI language is toggled.
@@ -165,21 +174,23 @@ Then open `http://localhost:8080` in your browser.
 ### 5. Stepped scroll navigation
 
 The two floating buttons (bottom-right) don't jump straight to the top/bottom
-of the page — each click advances one step through the same five key
-sections, in opposite order:
+of the page — each click advances one step through a sequence of stops.
+The down and up sequences are **not** simple mirrors of each other: down
+finishes at the page's very bottom, and up finishes at the page's very top.
 
 | Click # | Down icon (▼) stops at | Up icon (▲) stops at |
 |---|---|---|
-| 1 | Province dropdown | About / Information section |
-| 2 | Text input field | Output / generated link |
-| 3 | Interactive map | Interactive map |
-| 4 | Output / generated link | Text input field |
-| 5 (final) | About / Information section | Province dropdown |
+| 1 | Province dropdown | Footer / developer credit |
+| 2 | Text input field | About / Information section |
+| 3 | Interactive map | Output / generated link |
+| 4 | Output / generated link | Interactive map |
+| 5 | About / Information section | Text input field |
+| 6 (final) | Footer / developer credit | Very top of the page (main header) |
 
-Each button keeps its own step index (`scrollStepDown` / `scrollStepUp` in
-`script.js`), synced to a shared position so switching direction resumes
-sensibly from wherever the last click landed, and clamps at the final section
-rather than looping.
+Each button keeps its own independent step index (`scrollStepDown` /
+`scrollStepUp` in `script.js`) into its own six-stop sequence
+(`getDownSteps()` / `getUpSteps()`), and clamps at its final stop rather than
+looping back to the start.
 
 ### 6. Internationalization
 - A single `I18N` dictionary (`en` / `ar`) in `script.js` drives every string
@@ -237,35 +248,22 @@ Icons: **Font Awesome 6**.
 | News ticker badge | `fa-satellite-dish` |
 | Publish/copy notification | `fa-circle-check` (`#2E6F40`) |
 | Warning notice | `fa-triangle-exclamation` |
-| Qur'anic reminder | `fa-book-quran` |
 | Footer heart | `fa-heart` (heartbeat animation) |
 | Scroll up / down | `fa-angles-up` / `fa-angles-down` |
 | Username modal | `fa-user-pen` |
 | Identity bar | `fa-user` (username) / `fa-stopwatch` (timestamp) |
+| Edit username | `fa-pen` |
 
 ---
 
 ## 🔊 Audio feedback
 
-Clicking any wilaya directly on the SVG map triggers a short, clean beep —
+Choosing a wilaya — either by clicking it directly on the SVG map, or by
+picking it from the province dropdown — triggers a short, clean beep,
 generated entirely in-browser with the **Web Audio API** (a sine oscillator
 shaped by a fast attack/decay gain envelope). No audio files are loaded, so
 there's nothing to fetch or fail; if the API is unavailable the app simply
-stays silent. Selecting a province from the dropdown does not play a sound.
-
----
-
-## 📖 Qur'anic reminder
-
-Directly beneath the generated link, a collapsible panel (`fa-book-quran`
-icon, same expand/collapse mechanics as the legal notice) reveals:
-
-> قال تعالى: ﴿مَّا يَلْفِظُ مِن قَوْلٍ إِلَّا لَدَيْهِ رَقِيبٌ عَتِيدٌ﴾ (سورة ق، الآية 18)
-
-The verse text itself is fixed (independent of the interface language
-toggle), encouraging thoughtful, accountable sharing before a link is copied
-or shared. Only the collapsible's own label ("A reminder" / "تذكير") follows
-the active UI language.
+stays silent.
 
 ---
 
@@ -288,6 +286,10 @@ else's shared link:
    memory for the session, displayed in the identity bar under the text
    field, and woven into every link you generate afterwards (`u` positioned
    directly before `t` in the query string).
+5. **Changed your mind about your name?** Click the pencil icon next to it
+   in the identity bar at any time — the same modal reopens pre-filled with
+   your current name, and updating it only changes `username`; your
+   participation timestamp stays exactly as it was.
 
 No username is ever sent anywhere or stored server-side; it only ever lives
 inside the URL you choose to share.
@@ -327,9 +329,10 @@ caveat.
 ## 🔒 Privacy & compliance
 
 Algeria Pulse never uploads or stores any content — everything lives in the
-generated link itself. A collapsible notice reminds users that Algeria's
-**Law No. 09‑04 of 5 August 2009** governs online publishing conduct, and asks
-that shared content stay lawful and non-harmful.
+generated link itself. A collapsible notice (collapsed by default so it
+doesn't block the workspace, expandable via its chevron) reminds users that
+Algeria's **Law No. 09‑04 of 5 August 2009** governs online publishing
+conduct, and asks that shared content stay lawful and non-harmful.
 
 ---
 
