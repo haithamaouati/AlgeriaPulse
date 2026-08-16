@@ -53,7 +53,10 @@
       modal_error: "Please enter at least 2 characters.",
       modal_title_edit: "Update your username",
       modal_sub_edit: "This changes the name used in links you generate from now on.",
-      edit_username_aria: "Edit username"
+      edit_username_aria: "Edit username",
+      modal_anonymous: "Continue as Anonymous",
+      anonymous_label: "Anonymous",
+      new_idea_aria: "Start a new idea"
     },
     ar: {
       app_title: "نبض الجزائر",
@@ -102,7 +105,10 @@
       modal_error: "الرجاء إدخال حرفين على الأقل.",
       modal_title_edit: "تحديث اسم المستخدم",
       modal_sub_edit: "سيُستخدم هذا الاسم في الروابط التي تنشئها من الآن فصاعدًا.",
-      edit_username_aria: "تعديل اسم المستخدم"
+      edit_username_aria: "تعديل اسم المستخدم",
+      modal_anonymous: "المتابعة كمجهول",
+      anonymous_label: "مجهول",
+      new_idea_aria: "بدء فكرة جديدة"
     }
   };
 
@@ -112,7 +118,11 @@
   let currentProvinceId = null;
   let newsItems = [];
   let username = null;
+  let isAnonymous = false;
   let participationTimestamp = null;
+  let sharedView = false;
+  let sharedAuthorLabel = null;
+  let sharedAuthorTimestamp = null;
   let svgRoot = null;
   let mapGroup = null;
   let viewBoxCenter = { x: 0, y: 0 };
@@ -187,6 +197,9 @@
     els.usernameModalTitle = $("#usernameModalTitle");
     els.usernameModalSub = $("#usernameModalSub");
     els.editUsernameBtn = $("#editUsernameBtn");
+    els.usernameAnonymousBtn = $("#usernameAnonymousBtn");
+    els.newIdeaBtn = $("#newIdeaBtn");
+    els.sharedBadge = $("#sharedBadge");
   }
 
   /* ---------- Static event bindings ---------- */
@@ -214,6 +227,16 @@
       }
       els.usernameInput.setCustomValidity("");
       username = val;
+      isAnonymous = false;
+      if (!participationTimestamp) participationTimestamp = Date.now();
+      hideUsernameModal();
+      finalizeIdentity();
+    });
+
+    els.usernameAnonymousBtn.addEventListener("click", () => {
+      els.usernameInput.setCustomValidity("");
+      username = null;
+      isAnonymous = true;
       if (!participationTimestamp) participationTimestamp = Date.now();
       hideUsernameModal();
       finalizeIdentity();
@@ -222,6 +245,8 @@
     els.editUsernameBtn.addEventListener("click", () => {
       showUsernameModal({ editing: true });
     });
+
+    els.newIdeaBtn.addEventListener("click", startNewIdea);
 
     els.provinceSelect.addEventListener("change", (e) => {
       if (e.target.value) {
@@ -382,20 +407,29 @@
 
   /* ---------- Username identity (prompt modal + shared-link hydration) ---------- */
   function resolveIdentity() {
-    const params = new URLSearchParams(window.location.search);
-    const uParam = params.get("u");
-    const tParam = params.get("t");
-
-    // A visited shareable link carries its own participation timestamp —
-    // extract and keep it rather than generating a new one.
-    if (tParam) participationTimestamp = Number(tParam);
-
-    // The modal always appears on load (per spec); if the link already
-    // carries a username, prefill it as a courtesy so returning users can
-    // simply confirm instead of retyping.
-    if (uParam && els.usernameInput) {
-      els.usernameInput.value = decodeURIComponent(uParam);
+    // Reading someone else's shared pulse: never prompt on load. The modal
+    // only appears once the visitor chooses to start their own new idea.
+    if (sharedView) {
+      updateIdentityDisplay();
+      return;
     }
+    showUsernameModal();
+  }
+
+  function startNewIdea() {
+    sharedView = false;
+    sharedAuthorLabel = null;
+    sharedAuthorTimestamp = null;
+
+    els.pulseText.readOnly = false;
+    els.pulseText.value = "";
+
+    username = null;
+    isAnonymous = false;
+    participationTimestamp = null;
+
+    updateIdentityDisplay();
+    generateLink();
     showUsernameModal();
   }
 
@@ -416,6 +450,7 @@
       if (els.usernameModalTitle) els.usernameModalTitle.textContent = dict.modal_title_edit;
       if (els.usernameModalSub) els.usernameModalSub.textContent = dict.modal_sub_edit;
     } else {
+      els.usernameInput.value = "";
       if (els.usernameModalTitle) els.usernameModalTitle.textContent = dict.modal_title;
       if (els.usernameModalSub) els.usernameModalSub.textContent = dict.modal_sub;
     }
@@ -432,20 +467,30 @@
 
   function updateIdentityDisplay() {
     const dict = I18N[currentLang];
+    const locale = currentLang === "ar" ? "ar-DZ" : "en-GB";
+    const formatTimestamp = (ts) =>
+      new Intl.DateTimeFormat(locale, {
+        year: "numeric", month: "short", day: "numeric",
+        hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+      }).format(new Date(ts));
+
     if (els.metricUsername) {
-      els.metricUsername.textContent = username || dict.metric_no_user;
-    }
-    if (els.metricTimestamp) {
-      if (participationTimestamp) {
-        const locale = currentLang === "ar" ? "ar-DZ" : "en-GB";
-        els.metricTimestamp.textContent = new Intl.DateTimeFormat(locale, {
-          year: "numeric", month: "short", day: "numeric",
-          hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
-        }).format(new Date(participationTimestamp));
+      if (sharedView) {
+        els.metricUsername.textContent = sharedAuthorLabel || dict.anonymous_label;
+      } else if (isAnonymous) {
+        els.metricUsername.textContent = dict.anonymous_label;
       } else {
-        els.metricTimestamp.textContent = dict.metric_no_user;
+        els.metricUsername.textContent = username || dict.metric_no_user;
       }
     }
+
+    if (els.metricTimestamp) {
+      const ts = sharedView ? sharedAuthorTimestamp : participationTimestamp;
+      els.metricTimestamp.textContent = ts ? formatTimestamp(ts) : dict.metric_no_user;
+    }
+
+    if (els.editUsernameBtn) els.editUsernameBtn.hidden = sharedView;
+    if (els.sharedBadge) els.sharedBadge.hidden = !sharedView;
   }
 
   /* ---------- Live clock ---------- */
@@ -718,14 +763,15 @@
 
   function generateLink() {
     const text = els.pulseText.value.trim();
-    if (!currentProvinceId || !text || !username) {
+    const hasIdentity = isAnonymous || !!username;
+    if (sharedView || !currentProvinceId || !text || !hasIdentity) {
       els.outputLink.value = "";
       return;
     }
     const url = new URL(window.location.href);
     url.search = "";
     url.hash = "";
-    url.searchParams.set("u", username);
+    if (!isAnonymous) url.searchParams.set("u", username);
     url.searchParams.set("t", (participationTimestamp || Date.now()).toString());
     url.searchParams.set("p", currentProvinceId);
     url.searchParams.set("d", b64EncodeUnicode(text));
@@ -735,13 +781,21 @@
   function hydrateFromURL() {
     const params = new URLSearchParams(window.location.search);
     const p = params.get("p");
+    const u = params.get("u");
+    const t = params.get("t");
     const d = params.get("d");
+
     if (p && provinceById.has(p)) {
       selectProvince(p, { fromMap: false });
     }
+
     if (d) {
       try {
         els.pulseText.value = b64DecodeUnicode(d);
+        els.pulseText.readOnly = true;
+        sharedView = true;
+        sharedAuthorLabel = u ? decodeURIComponent(u) : null;
+        sharedAuthorTimestamp = t ? Number(t) : null;
       } catch (e) {
         console.warn("Could not decode shared text", e);
       }
