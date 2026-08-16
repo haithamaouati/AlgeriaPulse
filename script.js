@@ -73,7 +73,14 @@
       feed_deleted_toast: "Removed from your local feed",
       copy_snippet_aria: "Copy formatted snippet",
       snippet_copied: "Snippet copied to clipboard!",
-      relative_just_now: "just now"
+      relative_just_now: "just now",
+      analytics_nav_aria: "Your local analytics",
+      analytics_title: "Your local analytics",
+      analytics_sub: "A quick look at your local feed — nothing ever leaves this device.",
+      analytics_empty: "Nothing to show yet — create or open a few pulses first.",
+      analytics_unavailable: "The charting library didn't load, so analytics aren't available right now.",
+      analytics_breakdown_title: "Mine vs. viewed",
+      analytics_top_wilayas_title: "Top wilayas"
     },
     ar: {
       app_title: "نبض الجزائر",
@@ -142,7 +149,14 @@
       feed_deleted_toast: "تم الحذف من سجلّك المحلي",
       copy_snippet_aria: "نسخ المقتطف المنسّق",
       snippet_copied: "تم نسخ المقتطف!",
-      relative_just_now: "الآن"
+      relative_just_now: "الآن",
+      analytics_nav_aria: "سجلّك الإحصائي",
+      analytics_title: "سجلّك الإحصائي",
+      analytics_sub: "نظرة سريعة على سجلّك المحلي — لا يغادر شيء هذا الجهاز.",
+      analytics_empty: "لا يوجد شيء بعد — أنشئ أو افتح بضع نبضات أولاً.",
+      analytics_unavailable: "تعذّر تحميل مكتبة الرسوم البيانية، لذا الإحصائيات غير متاحة الآن.",
+      analytics_breakdown_title: "لك مقابل مُشاهَدة",
+      analytics_top_wilayas_title: "أكثر الولايات"
     }
   };
 
@@ -162,6 +176,7 @@
   let feedClearArmed = false;
   let svgRoot = null;
   let mapGroup = null;
+  let mapGroupSel = null;
   let viewBoxCenter = { x: 0, y: 0 };
   let viewBoxSize = { w: 0, h: 0 };
 
@@ -251,6 +266,13 @@
     els.feedEmpty = $("#feedEmpty");
     els.feedClearBtn = $("#feedClearBtn");
     els.toastContainer = $("#toastContainer");
+    els.analyticsNavBtn = $("#analyticsNavBtn");
+    els.analyticsModal = $("#analyticsModal");
+    els.analyticsCloseBtn = $("#analyticsCloseBtn");
+    els.analyticsEmpty = $("#analyticsEmpty");
+    els.analyticsCharts = $("#analyticsCharts");
+    els.analyticsDoughnutCanvas = $("#analyticsDoughnut");
+    els.analyticsBarCanvas = $("#analyticsBar");
   }
 
   /* ---------- Static event bindings ---------- */
@@ -349,6 +371,12 @@
       });
     });
     els.feedClearBtn.addEventListener("click", handleFeedClearClick);
+
+    els.analyticsNavBtn.addEventListener("click", openAnalyticsModal);
+    els.analyticsCloseBtn.addEventListener("click", closeAnalyticsModal);
+    els.analyticsModal.addEventListener("click", (e) => {
+      if (e.target === els.analyticsModal) closeAnalyticsModal();
+    });
   }
 
   /* ---------- Stepped multi-section scroll (floating icons) ---------- */
@@ -444,6 +472,7 @@
     const isDark = root.getAttribute("data-theme") === "dark";
     root.setAttribute("data-theme", isDark ? "light" : "dark");
     els.themeIcon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    if (els.analyticsModal && !els.analyticsModal.hidden) renderAnalytics();
   }
 
   /* ---------- Language ---------- */
@@ -476,6 +505,7 @@
     renderTicker();
     refreshUsernameModalCopy();
     if (els.feedModal && !els.feedModal.hidden) renderFeedList();
+    if (els.analyticsModal && !els.analyticsModal.hidden) renderAnalytics();
   }
 
   function refreshUsernameModalCopy() {
@@ -708,149 +738,229 @@
     paths.forEach((p) => mapGroup.appendChild(p));
     svgRoot.appendChild(mapGroup);
 
-    svgRoot.addEventListener("click", (e) => {
-      const path = e.target.closest("path[id]");
-      if (!path) return;
-      if (sharedView) {
-        playLockedBeep();
-        return;
-      }
-      playMapBeep();
-      selectProvince(path.id, { fromMap: true });
-    });
+    // D3 owns the group's transform going forward (smooth zoom/pan
+    // transitions live in focusMapOn/resetMapView below). Fall back to a
+    // plain DOM click listener if the D3 CDN failed to load.
+    if (typeof d3 !== "undefined") {
+      mapGroupSel = d3.select(mapGroup);
+      d3.select(svgRoot).on("click", (event) => {
+        const path = event.target.closest("path[id]");
+        if (!path) return;
+        if (sharedView) {
+          playLockedBeep();
+          return;
+        }
+        playMapBeep();
+        selectProvince(path.id, { fromMap: true });
+      });
+    } else {
+      svgRoot.addEventListener("click", (e) => {
+        const path = e.target.closest("path[id]");
+        if (!path) return;
+        if (sharedView) {
+          playLockedBeep();
+          return;
+        }
+        playMapBeep();
+        selectProvince(path.id, { fromMap: true });
+      });
+    }
   }
 
-  /* ---------- Map click audio feedback (Web Audio API) ---------- */
-  let audioCtx = null;
-  function getAudioContext() {
-    try {
-      if (!audioCtx) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContextClass) return null;
-        audioCtx = new AudioContextClass();
+  // Applies (optionally animated) an SVG transform to #mapGroup. Uses a D3
+  // transition when D3 is available for smooth interpolation; otherwise
+  // falls back to an instant attribute set so the map still works.
+  function applyMapTransform(transformStr, { animate = true, duration = 850, onEnd } = {}) {
+    if (!mapGroup) return;
+    if (mapGroupSel && animate) {
+      mapGroupSel
+        .transition()
+        .duration(duration)
+        .ease(d3.easeCubicInOut)
+        .attr("transform", transformStr)
+        .on("end", () => {
+          if (onEnd) onEnd();
+        });
+    } else {
+      mapGroup.setAttribute("transform", transformStr);
+      if (onEnd) onEnd();
+    }
+  }
+
+  /* ---------- Audio engine (Howler.js) ----------
+     Howler.js only *plays* audio — it doesn't synthesize tones — so each
+     cue is generated once as a short PCM waveform, packaged into a WAV
+     data URI, and handed to a Howl instance. Howler then owns playback:
+     it decodes once, handles the mobile "unlock on first gesture" dance,
+     and replays instantly on every subsequent call (the point of using it
+     here over raw oscillators is exactly that low-latency, reliable
+     replay). If the Howler CDN fails to load, every play*Beep() call below
+     is a silent no-op — the app keeps working without sound. */
+  let soundsReady = false;
+  let mapBeepSound = null;
+  let lockedBeepSound = null;
+  let copyBeepSound = null;
+  let saveBeepSound = null;
+
+  // Renders a set of tone segments into 16-bit PCM samples and returns a
+  // `data:audio/wav;base64,...` URI. Each segment: { freq, freqEnd?, start,
+  // duration, type: 'sine'|'square'|'triangle', peak }.
+  function synthWavDataURI(segments, sampleRate = 44100) {
+    const totalDuration = Math.max(...segments.map((s) => s.start + s.duration));
+    const totalSamples = Math.ceil(totalDuration * sampleRate) + 1;
+    const data = new Float32Array(totalSamples);
+
+    segments.forEach((seg) => {
+      const { freq, freqEnd, start, duration, type = "sine", peak = 0.5 } = seg;
+      const startSample = Math.floor(start * sampleRate);
+      const segSamples = Math.floor(duration * sampleRate);
+      for (let i = 0; i < segSamples; i++) {
+        const t = i / sampleRate;
+        const progress = duration > 0 ? t / duration : 0;
+        const f = freqEnd ? freq + (freqEnd - freq) * progress : freq;
+        const phase = 2 * Math.PI * f * t;
+
+        let sample;
+        if (type === "square") sample = Math.sign(Math.sin(phase)) || 0;
+        else if (type === "triangle") sample = (2 / Math.PI) * Math.asin(Math.sin(phase));
+        else sample = Math.sin(phase);
+
+        // Fast attack, gentle release envelope so tones click on cleanly
+        // and fade out without popping.
+        const attack = Math.min(1, t / 0.008);
+        const release = Math.min(1, (duration - t) / 0.05);
+        const envelope = Math.max(0, Math.min(attack, release));
+
+        const idx = startSample + i;
+        if (idx < data.length) data[idx] += sample * peak * envelope;
       }
-      if (audioCtx.state === "suspended") audioCtx.resume();
-      return audioCtx;
+    });
+
+    let peakAmp = 0;
+    for (let i = 0; i < data.length; i++) peakAmp = Math.max(peakAmp, Math.abs(data[i]));
+    const norm = peakAmp > 1 ? 1 / peakAmp : 1;
+
+    const pcm = new Int16Array(data.length);
+    for (let i = 0; i < data.length; i++) {
+      pcm[i] = Math.max(-1, Math.min(1, data[i] * norm)) * 32767;
+    }
+
+    return pcmToWavDataURI(pcm, sampleRate);
+  }
+
+  function pcmToWavDataURI(pcm, sampleRate) {
+    const numChannels = 1;
+    const bitsPerSample = 16;
+    const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
+    const blockAlign = (numChannels * bitsPerSample) / 8;
+    const dataSize = pcm.length * 2;
+
+    const buffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buffer);
+    const writeStr = (offset, str) => {
+      for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+    };
+
+    writeStr(0, "RIFF");
+    view.setUint32(4, 36 + dataSize, true);
+    writeStr(8, "WAVE");
+    writeStr(12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, byteRate, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitsPerSample, true);
+    writeStr(36, "data");
+    view.setUint32(40, dataSize, true);
+
+    let offset = 44;
+    for (let i = 0; i < pcm.length; i++) {
+      view.setInt16(offset, pcm[i], true);
+      offset += 2;
+    }
+
+    let binary = "";
+    const bytes = new Uint8Array(buffer);
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+    }
+    return "data:audio/wav;base64," + btoa(binary);
+  }
+
+  function initSounds() {
+    if (soundsReady || typeof Howl === "undefined") return;
+    try {
+      // Ascending "radar" chirp — map click or dropdown selection.
+      mapBeepSound = new Howl({
+        src: [synthWavDataURI([{ freq: 880, freqEnd: 1320, start: 0, duration: 0.16, type: "sine", peak: 0.5 }])],
+        format: ["wav"],
+        volume: 0.5
+      });
+
+      // Low, descending double-blip — locked/denied interaction attempt.
+      lockedBeepSound = new Howl({
+        src: [
+          synthWavDataURI([
+            { freq: 240, freqEnd: 160, start: 0, duration: 0.1, type: "square", peak: 0.32 },
+            { freq: 240, freqEnd: 160, start: 0.11, duration: 0.1, type: "square", peak: 0.32 }
+          ])
+        ],
+        format: ["wav"],
+        volume: 0.5
+      });
+
+      // Two-note success chime — copy link / copy snippet / share.
+      copyBeepSound = new Howl({
+        src: [
+          synthWavDataURI([
+            { freq: 659.25, start: 0, duration: 0.13, type: "sine", peak: 0.42 },
+            { freq: 987.77, start: 0.09, duration: 0.13, type: "sine", peak: 0.42 }
+          ])
+        ],
+        format: ["wav"],
+        volume: 0.55
+      });
+
+      // Single soft, higher blip — new local-feed entry saved.
+      saveBeepSound = new Howl({
+        src: [synthWavDataURI([{ freq: 1108.73, start: 0, duration: 0.11, type: "triangle", peak: 0.32 }])],
+        format: ["wav"],
+        volume: 0.5
+      });
+
+      soundsReady = true;
     } catch (e) {
-      return null;
+      soundsReady = false;
     }
   }
 
   function playMapBeep() {
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(880, now);
-      osc.frequency.exponentialRampToValueAtTime(1320, now + 0.07);
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.18, now + 0.015);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(now);
-      osc.stop(now + 0.16);
-    } catch (e) {
-      /* audio not available — fail silently */
-    }
+    initSounds();
+    if (mapBeepSound) mapBeepSound.play();
   }
 
   // A distinct, lower "denied" double-blip — played when the user tries to
   // interact with the map or dropdown while viewing a locked shared pulse.
   function playLockedBeep() {
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      const now = ctx.currentTime;
-      [0, 0.11].forEach((offset) => {
-        const t = now + offset;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc.type = "square";
-        osc.frequency.setValueAtTime(240, t);
-        osc.frequency.exponentialRampToValueAtTime(160, t + 0.08);
-
-        gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.12, t + 0.012);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start(t);
-        osc.stop(t + 0.1);
-      });
-    } catch (e) {
-      /* audio not available — fail silently */
-    }
+    initSounds();
+    if (lockedBeepSound) lockedBeepSound.play();
   }
 
   // A short, pleasant two-note "success" chime — played after a successful
   // copy (link or snippet) or share.
   function playCopyBeep() {
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      const now = ctx.currentTime;
-      [
-        { freq: 659.25, t: 0 },
-        { freq: 987.77, t: 0.09 }
-      ].forEach(({ freq, t: offset }) => {
-        const t = now + offset;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(freq, t);
-
-        gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.16, t + 0.012);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start(t);
-        osc.stop(t + 0.13);
-      });
-    } catch (e) {
-      /* audio not available — fail silently */
-    }
+    initSounds();
+    if (copyBeepSound) copyBeepSound.play();
   }
 
   // A single soft, higher blip — played when a new entry is first written
   // to the local feed (not on every subsequent draft update).
   function playSaveBeep() {
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    try {
-      const now = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(1108.73, now);
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.1, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(now);
-      osc.stop(now + 0.11);
-    } catch (e) {
-      /* audio not available — fail silently */
-    }
+    initSounds();
+    if (saveBeepSound) saveBeepSound.play();
   }
 
   /* ---------- Province selection & map zoom ---------- */
@@ -900,12 +1010,13 @@
       const s = computeScaleForBBox(bbox);
       const tx = viewBoxCenter.x - cx * s;
       const ty = viewBoxCenter.y - cy * s;
-      mapGroup.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+      applyMapTransform(`translate(${tx},${ty}) scale(${s})`, { duration: 850 });
     };
 
     if (animateOutFirst) {
-      mapGroup.style.transform = "translate(0px, 0px) scale(1)";
-      window.setTimeout(doZoomIn, 700);
+      // D3's transition `.on("end", ...)` sequences the zoom-out ->
+      // zoom-in pair precisely, rather than guessing a setTimeout delay.
+      applyMapTransform("translate(0,0) scale(1)", { duration: 700, onEnd: doZoomIn });
     } else {
       doZoomIn();
     }
@@ -916,18 +1027,36 @@
     const path = svgRoot.querySelector(`#${CSS.escape(id)}`);
     if (!path) return;
 
-    const old = mapGroup.querySelector("#sensorPulse");
-    if (old) old.remove();
-
     const bbox = path.getBBox();
     const cx = bbox.x + bbox.width / 2;
     const cy = bbox.y + bbox.height / 2;
     const baseR = Math.max(bbox.width, bbox.height) / 2 || 10;
 
+    if (mapGroupSel) {
+      // D3 data-join: creates/updates the ring group and its three circles
+      // declaratively. The infinite pulse loop itself stays in CSS
+      // (@keyframes sensorPulse) — far cheaper than re-triggering JS
+      // transitions every frame — D3's job here is the DOM/data binding
+      // and precise centroid placement.
+      mapGroupSel.select("#sensorPulse").remove();
+      const group = mapGroupSel.append("g").attr("id", "sensorPulse");
+      group
+        .selectAll("circle")
+        .data([1, 2, 3])
+        .join("circle")
+        .attr("cx", cx)
+        .attr("cy", cy)
+        .attr("r", baseR)
+        .attr("class", (n) => `sensor-ring sensor-ring--${n}`);
+      return;
+    }
+
+    // Fallback path if D3 failed to load.
+    const old = mapGroup.querySelector("#sensorPulse");
+    if (old) old.remove();
     const svgNS = "http://www.w3.org/2000/svg";
     const group = document.createElementNS(svgNS, "g");
     group.setAttribute("id", "sensorPulse");
-
     [1, 2, 3].forEach((n) => {
       const circle = document.createElementNS(svgNS, "circle");
       circle.setAttribute("cx", cx);
@@ -936,13 +1065,12 @@
       circle.setAttribute("class", `sensor-ring sensor-ring--${n}`);
       group.appendChild(circle);
     });
-
     mapGroup.appendChild(group);
   }
 
   function resetMapView() {
     if (!mapGroup) return;
-    mapGroup.style.transform = "translate(0px, 0px) scale(1)";
+    applyMapTransform("translate(0,0) scale(1)", { duration: 600 });
   }
 
   function updateProvinceDetails() {
@@ -1270,6 +1398,121 @@
       duration /= division.amount;
     }
     return null;
+  }
+
+  /* ---------- Local analytics dashboard (Chart.js) ----------
+     Reads the same localStorage feed as the archive panel and renders two
+     small, purely client-side charts — nothing is sent anywhere. Charts
+     are (re)created fresh each time the modal opens/re-renders, rather
+     than kept alive continuously, which keeps theme/language syncing
+     simple: just destroy and redraw. */
+  let analyticsDoughnutChart = null;
+  let analyticsBarChart = null;
+
+  function openAnalyticsModal() {
+    els.analyticsModal.hidden = false;
+    renderAnalytics();
+  }
+
+  function closeAnalyticsModal() {
+    els.analyticsModal.hidden = true;
+    destroyAnalyticsCharts();
+  }
+
+  function destroyAnalyticsCharts() {
+    if (analyticsDoughnutChart) {
+      analyticsDoughnutChart.destroy();
+      analyticsDoughnutChart = null;
+    }
+    if (analyticsBarChart) {
+      analyticsBarChart.destroy();
+      analyticsBarChart = null;
+    }
+  }
+
+  function renderAnalytics() {
+    const dict = I18N[currentLang];
+    destroyAnalyticsCharts();
+
+    if (typeof Chart === "undefined") {
+      els.analyticsEmpty.hidden = false;
+      els.analyticsEmpty.textContent = dict.analytics_unavailable;
+      els.analyticsCharts.hidden = true;
+      return;
+    }
+
+    const feed = loadFeed();
+    if (!feed.length) {
+      els.analyticsEmpty.hidden = false;
+      els.analyticsEmpty.textContent = dict.analytics_empty;
+      els.analyticsCharts.hidden = true;
+      return;
+    }
+    els.analyticsEmpty.hidden = true;
+    els.analyticsCharts.hidden = false;
+
+    const style = getComputedStyle(document.documentElement);
+    const textColor = style.getPropertyValue("--text").trim() || "#12271B";
+    const gridColor = "rgba(149, 213, 178, 0.18)";
+    Chart.defaults.font.family = "Cairo, sans-serif";
+    Chart.defaults.color = textColor;
+
+    const createdCount = feed.filter((e) => e.type === "created").length;
+    const viewedCount = feed.filter((e) => e.type === "viewed").length;
+
+    analyticsDoughnutChart = new Chart(els.analyticsDoughnutCanvas, {
+      type: "doughnut",
+      data: {
+        labels: [dict.feed_badge_created, dict.feed_badge_viewed],
+        datasets: [
+          {
+            data: [createdCount, viewedCount],
+            backgroundColor: ["#2E6F40", "#95D5B2"],
+            borderWidth: 0
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        cutout: "65%",
+        plugins: { legend: { position: "bottom" } }
+      }
+    });
+
+    const wilayaCounts = new Map();
+    feed.forEach((entry) => {
+      const name = currentLang === "ar" ? entry.provinceName_ar : entry.provinceName_en;
+      if (!name) return;
+      wilayaCounts.set(name, (wilayaCounts.get(name) || 0) + 1);
+    });
+    const topWilayas = Array.from(wilayaCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8);
+
+    analyticsBarChart = new Chart(els.analyticsBarCanvas, {
+      type: "bar",
+      data: {
+        labels: topWilayas.map(([name]) => name),
+        datasets: [
+          {
+            label: dict.analytics_top_wilayas_title,
+            data: topWilayas.map(([, count]) => count),
+            backgroundColor: "#4C956C",
+            borderRadius: 6,
+            maxBarThickness: 22
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        indexAxis: "y",
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { precision: 0 }, grid: { color: gridColor } },
+          y: { grid: { display: false } }
+        }
+      }
+    });
   }
 
   /* ---------- Copy / Share ---------- */

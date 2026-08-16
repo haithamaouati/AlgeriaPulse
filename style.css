@@ -191,6 +191,8 @@ body::after {
 .iconbar {
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -632,7 +634,10 @@ body::after {
 }
 .map-container path:hover { fill: var(--map-hover); }
 .map-container path.selected { fill: var(--map-selected); }
-#mapGroup { transform-origin: 0 0; transition: transform 0.85s cubic-bezier(0.65, 0, 0.35, 1); }
+/* Pan/zoom for #mapGroup is now animated via D3 transitions on the SVG
+   `transform` attribute (see script.js), so no CSS transition is declared
+   here — a CSS transition on `transform` would only apply to the `style`
+   property and does not animate SVG attribute changes. */
 
 .map-controls {
   position: absolute;
@@ -1094,6 +1099,26 @@ body::after {
 }
 .feed-clear-btn:hover { background: rgba(220, 80, 80, 0.12); color: #e05656; border-color: #e05656; }
 .feed-clear-btn.confirming { background: #e05656; color: #fff; border-color: #e05656; }
+
+/* ============ LOCAL ANALYTICS MODAL ============ */
+.analytics-modal-card { max-width: 420px; }
+
+.analytics-charts {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.analytics-chart-block h3 {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: center;
+}
+.analytics-chart-block canvas {
+  width: 100% !important;
+  max-height: 220px;
+}
 
 /* ============ TOAST NOTIFICATIONS ============ */
 .toast-container {
