@@ -82,7 +82,38 @@
         <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
         Select your wilaya
       </label>
-      <select id="provinceSelect" class="select"></select>
+      <div class="select-wrap" id="provinceSelectWrap">
+        <select id="provinceSelect" class="select"></select>
+      </div>
+    </section>
+
+    <!-- Interactive Map -->
+    <section class="card glass map-card" id="mapSection">
+      <label class="card__label" data-i18n="map_label">
+        <i class="fa-solid fa-map" aria-hidden="true"></i>
+        Tap a wilaya on the map
+      </label>
+      <div class="map-wrap" id="mapWrap">
+        <div class="map-grid" aria-hidden="true"></div>
+        <div id="mapContainer" class="map-container" role="group" aria-label="Map of Algeria"></div>
+        <div class="map-controls">
+          <button id="mapReset" class="icon-btn small" type="button" aria-label="Reset map view">
+            <i class="fa-solid fa-arrows-to-circle" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Selected wilaya: compact icon chips -->
+      <div class="province-details">
+        <div class="detail-chip">
+          <i class="fa-solid fa-fingerprint" aria-hidden="true"></i>
+          <span id="detailId">—</span>
+        </div>
+        <div class="detail-chip">
+          <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+          <span id="detailName">—</span>
+        </div>
+      </div>
     </section>
 
     <!-- Warning notice (collapsible) -->
@@ -125,46 +156,13 @@
       <!-- Identity bar: username + participation timestamp -->
       <div class="metrics" id="identityBar">
         <span class="metric">
-          <i class="fa-solid fa-user" aria-hidden="true"></i>
+          <i class="fa-solid fa-user" id="identityUserIcon" aria-hidden="true"></i>
           <span data-i18n="metric_user_label">User</span>: <span id="metricUsername">—</span>
           <button id="editUsernameBtn" class="edit-username-btn" type="button" aria-label="Edit username" data-i18n-aria="edit_username_aria">
             <i class="fa-solid fa-pen" aria-hidden="true"></i>
           </button>
         </span>
         <span class="metric"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i> <span data-i18n="metric_time_label">Participated</span>: <span id="metricTimestamp">—</span></span>
-      </div>
-    </section>
-
-    <!-- Interactive Map -->
-    <section class="card glass map-card" id="mapSection">
-      <label class="card__label" data-i18n="map_label">
-        <i class="fa-solid fa-map" aria-hidden="true"></i>
-        Tap a wilaya on the map
-      </label>
-      <div class="map-wrap">
-        <div class="map-grid" aria-hidden="true"></div>
-        <div id="mapContainer" class="map-container" role="group" aria-label="Map of Algeria"></div>
-        <div class="map-controls">
-          <button id="mapReset" class="icon-btn small" type="button" aria-label="Reset map view">
-            <i class="fa-solid fa-arrows-to-circle" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Province details -->
-      <div class="province-details">
-        <div class="detail">
-          <span class="detail__label" data-i18n="detail_id">ID</span>
-          <span class="detail__value" id="detailId">—</span>
-        </div>
-        <div class="detail">
-          <span class="detail__label" data-i18n="detail_en">Name (EN)</span>
-          <span class="detail__value" id="detailEn">—</span>
-        </div>
-        <div class="detail">
-          <span class="detail__label" data-i18n="detail_ar">Name (AR)</span>
-          <span class="detail__value" id="detailAr" dir="rtl">—</span>
-        </div>
       </div>
     </section>
 
@@ -241,7 +239,7 @@
     </div>
   </section>
 
-  <p class="version" id="versionTag">Version: 1.4.0</p>
+  <p class="version" id="versionTag">Version: 1.5.0</p>
 
   <!-- ============ FOOTER ============ -->
   <footer class="footer" id="footerSection">
@@ -265,7 +263,10 @@
       <input id="usernameInput" type="text" maxlength="24" data-i18n-placeholder="modal_placeholder" placeholder="Enter a username…" />
       <div class="modal-actions">
         <button type="submit" class="modal-submit" id="usernameSubmit" data-i18n="modal_submit">Continue</button>
-        <button type="button" class="modal-anonymous" id="usernameAnonymousBtn" data-i18n="modal_anonymous">Continue as Anonymous</button>
+        <button type="button" class="modal-anonymous" id="usernameAnonymousBtn">
+          <i class="fa-solid fa-user-secret" aria-hidden="true"></i>
+          <span data-i18n="modal_anonymous">Continue as Anonymous</span>
+        </button>
       </div>
     </form>
   </div>
