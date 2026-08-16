@@ -358,6 +358,35 @@ body::after {
 }
 .card__label i { color: var(--primary-light); }
 
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.card__header .card__label { margin-block-end: 10px; }
+.card__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-block-end: 10px;
+}
+
+.shared-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary-light);
+  background: var(--input-bg);
+  border: 1px solid var(--surface-border);
+  border-radius: 999px;
+  padding: 5px 11px;
+  white-space: nowrap;
+}
+
 /* Select */
 .select {
   width: 100%;
@@ -442,6 +471,11 @@ body::after {
   resize: vertical;
 }
 .textarea::placeholder { color: var(--text-muted); opacity: 0.75; }
+.textarea[readonly] {
+  cursor: default;
+  color: var(--text-muted);
+  background: rgba(149, 213, 178, 0.08);
+}
 
 .metrics {
   display: flex;
@@ -483,6 +517,7 @@ body::after {
   color: #fff;
   transform: scale(1.1);
 }
+.edit-username-btn[hidden] { display: none; }
 
 /* Map */
 .map-card { padding-bottom: 20px; }
@@ -820,6 +855,30 @@ body::after {
 }
 .modal-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 16px var(--bg-glow-1); }
 .modal-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.modal-anonymous {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--surface-border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.modal-anonymous:hover {
+  background: var(--input-bg);
+  color: var(--text);
+  border-color: var(--primary-light);
+}
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 520px) {
