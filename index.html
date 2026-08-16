@@ -52,6 +52,9 @@
       <button id="aboutNavBtn" class="icon-btn" type="button" aria-label="About Algeria Pulse" data-i18n-aria="about_nav_aria">
         <i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i>
       </button>
+      <button id="feedNavBtn" class="icon-btn" type="button" aria-label="Your local feed" data-i18n-aria="feed_nav_aria">
+        <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+      </button>
     </nav>
   </header>
 
@@ -177,14 +180,13 @@
         <button id="copyBtn" class="icon-btn" type="button" aria-label="Copy link">
           <i class="fa-regular fa-copy" aria-hidden="true"></i>
         </button>
+        <button id="copySnippetBtn" class="icon-btn" type="button" aria-label="Copy formatted snippet" data-i18n-aria="copy_snippet_aria">
+          <i class="fa-solid fa-hashtag" aria-hidden="true"></i>
+        </button>
         <button id="shareBtn" class="icon-btn" type="button" aria-label="Share link">
           <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
         </button>
       </div>
-      <p class="output-hint" id="copyHint" aria-live="polite">
-        <i class="fa-solid fa-circle-check output-hint__icon" id="copyHintIcon" aria-hidden="true"></i>
-        <span id="copyHintText"></span>
-      </p>
     </section>
 
   </main>
@@ -239,7 +241,7 @@
     </div>
   </section>
 
-  <p class="version" id="versionTag">Version: 1.5.0</p>
+  <p class="version" id="versionTag">Version: 1.6.0</p>
 
   <!-- ============ FOOTER ============ -->
   <footer class="footer" id="footerSection">
@@ -271,6 +273,39 @@
     </form>
   </div>
 </div>
+
+<!-- ============ LOCAL FEED MODAL ============ -->
+<div class="modal-overlay" id="feedModal" role="dialog" aria-modal="true" aria-labelledby="feedModalTitle" hidden>
+  <div class="modal-card glass feed-modal-card">
+    <button class="modal-close" id="feedCloseBtn" type="button" aria-label="Close" data-i18n-aria="feed_close_aria">
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
+    <i class="fa-solid fa-clock-rotate-left modal-icon" aria-hidden="true"></i>
+    <h2 id="feedModalTitle" data-i18n="feed_title">Your local feed</h2>
+    <p class="modal-sub" data-i18n="feed_sub">Pulses you've created or viewed, saved only on this device.</p>
+
+    <div class="feed-filters">
+      <div class="feed-search-wrap">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input type="text" id="feedSearch" class="feed-search" data-i18n-placeholder="feed_search_placeholder" placeholder="Search your feed…" />
+      </div>
+      <div class="feed-filter-tabs" role="tablist">
+        <button type="button" class="feed-filter-tab active" data-filter="all" data-i18n="feed_filter_all">All</button>
+        <button type="button" class="feed-filter-tab" data-filter="mine" data-i18n="feed_filter_mine">Mine</button>
+        <button type="button" class="feed-filter-tab" data-filter="viewed" data-i18n="feed_filter_viewed">Viewed</button>
+      </div>
+    </div>
+
+    <div class="feed-list" id="feedList">
+      <p class="feed-empty" id="feedEmpty" data-i18n="feed_empty">Nothing saved yet — pulses you create or open will show up here.</p>
+    </div>
+
+    <button type="button" class="feed-clear-btn" id="feedClearBtn" data-i18n="feed_clear">Clear local feed</button>
+  </div>
+</div>
+
+<!-- ============ TOAST NOTIFICATIONS ============ -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
 <!-- ============ FLOATING SCROLL CONTROLS ============ -->
 <div class="scroll-fab-group" aria-hidden="false">

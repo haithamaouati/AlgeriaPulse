@@ -53,7 +53,27 @@
       edit_username_aria: "Edit username",
       modal_anonymous: "Continue as Anonymous",
       anonymous_label: "Anonymous",
-      new_idea_aria: "Start a new idea"
+      new_idea_aria: "Start a new idea",
+      feed_nav_aria: "Your local feed",
+      feed_close_aria: "Close",
+      feed_title: "Your local feed",
+      feed_sub: "Pulses you've created or viewed, saved only on this device.",
+      feed_search_placeholder: "Search your feed…",
+      feed_filter_all: "All",
+      feed_filter_mine: "Mine",
+      feed_filter_viewed: "Viewed",
+      feed_empty: "Nothing saved yet — pulses you create or open will show up here.",
+      feed_empty_filtered: "Nothing matches that search or filter.",
+      feed_clear: "Clear local feed",
+      feed_clear_confirm: "Tap again to confirm",
+      feed_badge_created: "Yours",
+      feed_badge_viewed: "Viewed",
+      feed_saved_toast: "Saved to your local feed",
+      feed_cleared_toast: "Local feed cleared",
+      feed_deleted_toast: "Removed from your local feed",
+      copy_snippet_aria: "Copy formatted snippet",
+      snippet_copied: "Snippet copied to clipboard!",
+      relative_just_now: "just now"
     },
     ar: {
       app_title: "نبض الجزائر",
@@ -102,7 +122,27 @@
       edit_username_aria: "تعديل اسم المستخدم",
       modal_anonymous: "المتابعة كمجهول",
       anonymous_label: "مجهول",
-      new_idea_aria: "بدء فكرة جديدة"
+      new_idea_aria: "بدء فكرة جديدة",
+      feed_nav_aria: "سجلّك المحلي",
+      feed_close_aria: "إغلاق",
+      feed_title: "سجلّك المحلي",
+      feed_sub: "النبضات التي أنشأتها أو شاهدتها، محفوظة على جهازك فقط.",
+      feed_search_placeholder: "ابحث في سجلّك…",
+      feed_filter_all: "الكل",
+      feed_filter_mine: "لي",
+      feed_filter_viewed: "مُشاهَدة",
+      feed_empty: "لا يوجد شيء محفوظ بعد — ستظهر هنا النبضات التي تنشئها أو تفتحها.",
+      feed_empty_filtered: "لا توجد نتائج مطابقة لهذا البحث أو التصفية.",
+      feed_clear: "مسح السجلّ المحلي",
+      feed_clear_confirm: "اضغط مرة أخرى للتأكيد",
+      feed_badge_created: "لك",
+      feed_badge_viewed: "مُشاهَدة",
+      feed_saved_toast: "تم الحفظ في سجلّك المحلي",
+      feed_cleared_toast: "تم مسح السجلّ المحلي",
+      feed_deleted_toast: "تم الحذف من سجلّك المحلي",
+      copy_snippet_aria: "نسخ المقتطف المنسّق",
+      snippet_copied: "تم نسخ المقتطف!",
+      relative_just_now: "الآن"
     }
   };
 
@@ -117,6 +157,9 @@
   let sharedView = false;
   let sharedAuthorLabel = null;
   let sharedAuthorTimestamp = null;
+  let feedFilter = "all";
+  let feedSearchTerm = "";
+  let feedClearArmed = false;
   let svgRoot = null;
   let mapGroup = null;
   let viewBoxCenter = { x: 0, y: 0 };
@@ -157,6 +200,9 @@
     hydrateFromURL();
     updateLockState();
     resolveIdentity();
+
+    // Keep the relative "X minutes ago" timestamp in the identity bar live.
+    window.setInterval(updateIdentityDisplay, 30000);
   }
 
   function cacheElements() {
@@ -180,9 +226,8 @@
     els.mapWrap = $("#mapWrap");
     els.outputLink = $("#outputLink");
     els.copyBtn = $("#copyBtn");
+    els.copySnippetBtn = $("#copySnippetBtn");
     els.shareBtn = $("#shareBtn");
-    els.copyHint = $("#copyHint");
-    els.copyHintText = $("#copyHintText");
     els.aboutNavBtn = $("#aboutNavBtn");
     els.aboutSection = $("#about");
     els.tickerTrack = $("#tickerTrack");
@@ -197,6 +242,15 @@
     els.usernameAnonymousBtn = $("#usernameAnonymousBtn");
     els.newIdeaBtn = $("#newIdeaBtn");
     els.sharedBadge = $("#sharedBadge");
+    els.feedNavBtn = $("#feedNavBtn");
+    els.feedModal = $("#feedModal");
+    els.feedCloseBtn = $("#feedCloseBtn");
+    els.feedSearch = $("#feedSearch");
+    els.feedFilterTabs = document.querySelectorAll(".feed-filter-tab");
+    els.feedList = $("#feedList");
+    els.feedEmpty = $("#feedEmpty");
+    els.feedClearBtn = $("#feedClearBtn");
+    els.toastContainer = $("#toastContainer");
   }
 
   /* ---------- Static event bindings ---------- */
@@ -268,6 +322,7 @@
     els.mapReset.addEventListener("click", resetMapView);
 
     els.copyBtn.addEventListener("click", copyLink);
+    els.copySnippetBtn.addEventListener("click", copySnippet);
     els.shareBtn.addEventListener("click", shareLink);
 
     els.aboutNavBtn.addEventListener("click", () => {
@@ -276,6 +331,24 @@
 
     els.scrollBottomBtn.addEventListener("click", scrollStepDown);
     els.scrollTopBtn.addEventListener("click", scrollStepUp);
+
+    els.feedNavBtn.addEventListener("click", openFeedModal);
+    els.feedCloseBtn.addEventListener("click", closeFeedModal);
+    els.feedModal.addEventListener("click", (e) => {
+      if (e.target === els.feedModal) closeFeedModal();
+    });
+    els.feedSearch.addEventListener("input", (e) => {
+      feedSearchTerm = e.target.value.trim().toLowerCase();
+      renderFeedList();
+    });
+    els.feedFilterTabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        feedFilter = tab.dataset.filter;
+        els.feedFilterTabs.forEach((t) => t.classList.toggle("active", t === tab));
+        renderFeedList();
+      });
+    });
+    els.feedClearBtn.addEventListener("click", handleFeedClearClick);
   }
 
   /* ---------- Stepped multi-section scroll (floating icons) ---------- */
@@ -383,6 +456,7 @@
     els.langToggleLabel.textContent = lang === "en" ? "AR" : "EN";
 
     document.querySelectorAll("[data-i18n]").forEach((node) => {
+      if (node === els.feedClearBtn && feedClearArmed) return;
       const key = node.getAttribute("data-i18n");
       if (dict[key]) node.textContent = dict[key];
     });
@@ -401,6 +475,7 @@
     updateIdentityDisplay();
     renderTicker();
     refreshUsernameModalCopy();
+    if (els.feedModal && !els.feedModal.hidden) renderFeedList();
   }
 
   function refreshUsernameModalCopy() {
@@ -512,7 +587,13 @@
 
     if (els.metricTimestamp) {
       const ts = sharedView ? sharedAuthorTimestamp : participationTimestamp;
-      els.metricTimestamp.textContent = ts ? formatTimestamp(ts) : dict.metric_no_user;
+      if (ts) {
+        els.metricTimestamp.textContent = relativeTimeString(ts) || formatTimestamp(ts);
+        els.metricTimestamp.title = formatTimestamp(ts);
+      } else {
+        els.metricTimestamp.textContent = dict.metric_no_user;
+        els.metricTimestamp.removeAttribute("title");
+      }
     }
 
     if (els.editUsernameBtn) els.editUsernameBtn.hidden = sharedView;
@@ -712,6 +793,66 @@
     }
   }
 
+  // A short, pleasant two-note "success" chime — played after a successful
+  // copy (link or snippet) or share.
+  function playCopyBeep() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      [
+        { freq: 659.25, t: 0 },
+        { freq: 987.77, t: 0.09 }
+      ].forEach(({ freq, t: offset }) => {
+        const t = now + offset;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, t);
+
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.16, t + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(t);
+        osc.stop(t + 0.13);
+      });
+    } catch (e) {
+      /* audio not available — fail silently */
+    }
+  }
+
+  // A single soft, higher blip — played when a new entry is first written
+  // to the local feed (not on every subsequent draft update).
+  function playSaveBeep() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(1108.73, now);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.1, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.11);
+    } catch (e) {
+      /* audio not available — fail silently */
+    }
+  }
+
   /* ---------- Province selection & map zoom ---------- */
   function selectProvince(id, opts = {}) {
     const province = provinceById.get(id);
@@ -845,6 +986,20 @@
     url.searchParams.set("p", currentProvinceId);
     url.searchParams.set("d", b64EncodeUnicode(text));
     els.outputLink.value = url.toString();
+
+    const p = provinceById.get(currentProvinceId);
+    saveFeedEntry({
+      id: `created:${currentProvinceId}:${participationTimestamp}`,
+      type: "created",
+      url: els.outputLink.value,
+      provinceId: currentProvinceId,
+      provinceName_en: p ? p.name_en : "",
+      provinceName_ar: p ? p.name_ar : "",
+      text,
+      username: isAnonymous ? null : username,
+      isAnonymous,
+      timestamp: participationTimestamp || Date.now()
+    });
   }
 
   function hydrateFromURL() {
@@ -865,29 +1020,317 @@
         sharedView = true;
         sharedAuthorLabel = u ? decodeURIComponent(u) : null;
         sharedAuthorTimestamp = t ? Number(t) : null;
+
+        const province = p ? provinceById.get(p) : null;
+        saveFeedEntry({
+          id: `viewed:${p || "unknown"}:${sharedAuthorTimestamp || "0"}`,
+          type: "viewed",
+          url: window.location.href,
+          provinceId: p || null,
+          provinceName_en: province ? province.name_en : "",
+          provinceName_ar: province ? province.name_ar : "",
+          text: els.pulseText.value,
+          username: sharedAuthorLabel,
+          isAnonymous: !sharedAuthorLabel,
+          timestamp: sharedAuthorTimestamp || Date.now()
+        });
       } catch (e) {
         console.warn("Could not decode shared text", e);
       }
     }
   }
 
+  /* ---------- Local feed / archive (localStorage) ----------
+     Best-effort persistence: every read/write is wrapped in try/catch so
+     the app keeps working even where storage is unavailable or blocked
+     (private browsing, restricted iframes, etc.) — the feed feature just
+     quietly does nothing in that case. */
+  const FEED_STORAGE_KEY = "algeriaPulse:feed";
+  const FEED_MAX_ENTRIES = 100;
+
+  function safeStorageGet(key) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch (e) {
+      return null;
+    }
+  }
+  function safeStorageSet(key, value) {
+    try {
+      window.localStorage.setItem(key, value);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function loadFeed() {
+    const raw = safeStorageGet(FEED_STORAGE_KEY);
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function persistFeed(list) {
+    return safeStorageSet(FEED_STORAGE_KEY, JSON.stringify(list.slice(0, FEED_MAX_ENTRIES)));
+  }
+
+  // Upserts by stable id: repeated calls while drafting (every keystroke)
+  // update the same entry in place rather than spamming new rows. A toast
+  // and save-beep only fire the first time a given id is written.
+  function saveFeedEntry(entry) {
+    const feed = loadFeed();
+    const existingIndex = feed.findIndex((e) => e.id === entry.id);
+    const isNew = existingIndex === -1;
+    const savedAt = isNew ? Date.now() : feed[existingIndex].savedAt;
+    const record = { ...entry, savedAt };
+
+    if (isNew) {
+      feed.unshift(record);
+    } else {
+      feed[existingIndex] = record;
+    }
+
+    const ok = persistFeed(feed);
+    if (ok && isNew) {
+      playSaveBeep();
+      showToast(I18N[currentLang].feed_saved_toast, { icon: "fa-bookmark", variant: "save" });
+      if (els.feedModal && !els.feedModal.hidden) renderFeedList();
+    }
+  }
+
+  function deleteFeedEntry(id) {
+    const feed = loadFeed().filter((e) => e.id !== id);
+    if (persistFeed(feed)) {
+      showToast(I18N[currentLang].feed_deleted_toast, { icon: "fa-trash", variant: "warn" });
+      renderFeedList();
+    }
+  }
+
+  function clearFeedStorage() {
+    try {
+      window.localStorage.removeItem(FEED_STORAGE_KEY);
+    } catch (e) {
+      /* ignore */
+    }
+    showToast(I18N[currentLang].feed_cleared_toast, { icon: "fa-trash" });
+    renderFeedList();
+  }
+
+  function handleFeedClearClick() {
+    const dict = I18N[currentLang];
+    if (!feedClearArmed) {
+      feedClearArmed = true;
+      els.feedClearBtn.classList.add("confirming");
+      els.feedClearBtn.textContent = dict.feed_clear_confirm;
+      window.setTimeout(() => {
+        feedClearArmed = false;
+        els.feedClearBtn.classList.remove("confirming");
+        els.feedClearBtn.textContent = dict.feed_clear;
+      }, 3000);
+      return;
+    }
+    feedClearArmed = false;
+    els.feedClearBtn.classList.remove("confirming");
+    els.feedClearBtn.textContent = dict.feed_clear;
+    clearFeedStorage();
+  }
+
+  function openFeedModal() {
+    els.feedModal.hidden = false;
+    renderFeedList();
+  }
+  function closeFeedModal() {
+    els.feedModal.hidden = true;
+  }
+
+  function renderFeedList() {
+    if (!els.feedList) return;
+    const dict = I18N[currentLang];
+    const feed = loadFeed();
+
+    const filtered = feed.filter((entry) => {
+      if (feedFilter === "mine" && entry.type !== "created") return false;
+      if (feedFilter === "viewed" && entry.type !== "viewed") return false;
+      if (feedSearchTerm) {
+        const wilayaName = currentLang === "ar" ? entry.provinceName_ar : entry.provinceName_en;
+        const haystack = `${entry.text || ""} ${wilayaName || ""} ${entry.username || ""}`.toLowerCase();
+        if (!haystack.includes(feedSearchTerm)) return false;
+      }
+      return true;
+    });
+
+    els.feedList.innerHTML = "";
+
+    if (!filtered.length) {
+      const empty = document.createElement("p");
+      empty.className = "feed-empty";
+      empty.textContent = feed.length ? dict.feed_empty_filtered : dict.feed_empty;
+      els.feedList.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach((entry) => els.feedList.appendChild(buildFeedItemElement(entry)));
+  }
+
+  function buildFeedItemElement(entry) {
+    const dict = I18N[currentLang];
+    const item = document.createElement("div");
+    item.className = "feed-item";
+    item.setAttribute("role", "button");
+    item.setAttribute("tabindex", "0");
+
+    const body = document.createElement("div");
+    body.className = "feed-item__body";
+
+    const top = document.createElement("div");
+    top.className = "feed-item__top";
+
+    const badge = document.createElement("span");
+    badge.className = "feed-item__badge" + (entry.type === "viewed" ? " feed-item__badge--viewed" : "");
+    badge.textContent = entry.type === "viewed" ? dict.feed_badge_viewed : dict.feed_badge_created;
+
+    const wilaya = document.createElement("span");
+    wilaya.className = "feed-item__wilaya";
+    const wilayaName = currentLang === "ar" ? entry.provinceName_ar : entry.provinceName_en;
+    wilaya.textContent = wilayaName || "—";
+
+    top.appendChild(badge);
+    top.appendChild(wilaya);
+
+    const text = document.createElement("p");
+    text.className = "feed-item__text";
+    text.textContent = entry.text || "";
+
+    const meta = document.createElement("div");
+    meta.className = "feed-item__meta";
+    const who = entry.isAnonymous || !entry.username ? dict.anonymous_label : entry.username;
+    const metaIcon = entry.isAnonymous || !entry.username ? "fa-user-secret" : "fa-user";
+    meta.innerHTML = `<i class="fa-solid ${metaIcon}" aria-hidden="true"></i>`;
+    meta.appendChild(document.createTextNode(` ${who} · `));
+    const timeSpan = document.createElement("span");
+    timeSpan.textContent = relativeTimeString(entry.timestamp) || "";
+    meta.appendChild(timeSpan);
+
+    body.appendChild(top);
+    body.appendChild(text);
+    body.appendChild(meta);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "feed-item__delete";
+    deleteBtn.setAttribute("aria-label", dict.feed_deleted_toast);
+    deleteBtn.innerHTML = `<i class="fa-solid fa-trash" aria-hidden="true"></i>`;
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteFeedEntry(entry.id);
+    });
+
+    const navigate = () => {
+      window.location.href = entry.url;
+    };
+    item.addEventListener("click", navigate);
+    item.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        navigate();
+      }
+    });
+
+    item.appendChild(body);
+    item.appendChild(deleteBtn);
+    return item;
+  }
+
+  /* ---------- Relative time (timeago) ----------
+     Uses Intl.RelativeTimeFormat, which natively localizes to Arabic or
+     English (e.g. "5 minutes ago" / "قبل 5 دقائق") without any manual
+     string tables. */
+  function relativeTimeString(ts) {
+    if (!ts) return null;
+    const divisions = [
+      { amount: 60, unit: "second" },
+      { amount: 60, unit: "minute" },
+      { amount: 24, unit: "hour" },
+      { amount: 7, unit: "day" },
+      { amount: 4.34524, unit: "week" },
+      { amount: 12, unit: "month" },
+      { amount: Number.POSITIVE_INFINITY, unit: "year" }
+    ];
+    let duration = (ts - Date.now()) / 1000;
+    const rtf = new Intl.RelativeTimeFormat(currentLang === "ar" ? "ar" : "en", { numeric: "auto" });
+    for (const division of divisions) {
+      if (Math.abs(duration) < division.amount) {
+        return rtf.format(Math.round(duration), division.unit);
+      }
+      duration /= division.amount;
+    }
+    return null;
+  }
+
   /* ---------- Copy / Share ---------- */
   async function copyLink() {
     const dict = I18N[currentLang];
     if (!els.outputLink.value) {
-      showHint(dict.need_input);
+      showToast(dict.need_input, { variant: "warn", icon: "fa-triangle-exclamation" });
       return;
     }
     try {
       await navigator.clipboard.writeText(els.outputLink.value);
-      showHint(dict.copied);
+      playCopyBeep();
+      showToast(dict.copied, { icon: "fa-circle-check" });
     } catch (e) {
       els.outputLink.select();
       try {
         document.execCommand("copy");
-        showHint(dict.copied);
+        playCopyBeep();
+        showToast(dict.copied, { icon: "fa-circle-check" });
       } catch (err) {
-        showHint(dict.copy_failed);
+        showToast(dict.copy_failed, { variant: "warn", icon: "fa-triangle-exclamation" });
+      }
+    }
+  }
+
+  // "[Algeria Pulse - Wilaya Name] Idea/News: ... | By: Username | Link: ..."
+  function buildSnippet() {
+    if (!els.outputLink.value) return null;
+    const dict = I18N[currentLang];
+    const p = currentProvinceId ? provinceById.get(currentProvinceId) : null;
+    const wilayaName = p ? (currentLang === "ar" ? p.name_ar : p.name_en) : "";
+    const text = els.pulseText.value.trim();
+    const who = isAnonymous ? dict.anonymous_label : (username || "");
+    return `[${dict.app_title} - ${wilayaName}] ${dict.write_label}: ${text} | ${dict.metric_user_label}: ${who} | ${dict.output_label}: ${els.outputLink.value}`;
+  }
+
+  async function copySnippet() {
+    const dict = I18N[currentLang];
+    const snippet = buildSnippet();
+    if (!snippet) {
+      showToast(dict.need_input, { variant: "warn", icon: "fa-triangle-exclamation" });
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(snippet);
+      playCopyBeep();
+      showToast(dict.snippet_copied, { icon: "fa-hashtag" });
+    } catch (e) {
+      try {
+        const temp = document.createElement("textarea");
+        temp.value = snippet;
+        temp.style.position = "fixed";
+        temp.style.opacity = "0";
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        temp.remove();
+        playCopyBeep();
+        showToast(dict.snippet_copied, { icon: "fa-hashtag" });
+      } catch (err) {
+        showToast(dict.copy_failed, { variant: "warn", icon: "fa-triangle-exclamation" });
       }
     }
   }
@@ -895,12 +1338,17 @@
   async function shareLink() {
     const dict = I18N[currentLang];
     if (!els.outputLink.value) {
-      showHint(dict.need_input);
+      showToast(dict.need_input, { variant: "warn", icon: "fa-triangle-exclamation" });
       return;
     }
     if (navigator.share) {
       try {
-        await navigator.share({ title: I18N[currentLang].app_title, url: els.outputLink.value });
+        const p = currentProvinceId ? provinceById.get(currentProvinceId) : null;
+        const wilayaName = p ? (currentLang === "ar" ? p.name_ar : p.name_en) : "";
+        const text = els.pulseText.value.trim();
+        const shareText = `[${dict.app_title} - ${wilayaName}] ${text}`;
+        await navigator.share({ title: dict.app_title, text: shareText, url: els.outputLink.value });
+        playCopyBeep();
       } catch (e) {
         /* user cancelled — no-op */
       }
@@ -909,13 +1357,31 @@
     }
   }
 
-  function showHint(msg) {
-    els.copyHintText.textContent = msg;
-    els.copyHint.classList.add("is-visible");
-    window.clearTimeout(showHint._t);
-    showHint._t = window.setTimeout(() => {
-      els.copyHint.classList.remove("is-visible");
-    }, 2500);
+  /* ---------- Toast notifications ---------- */
+  function showToast(message, opts = {}) {
+    if (!els.toastContainer || !message) return;
+    const toast = document.createElement("div");
+    toast.className = "toast" + (opts.variant ? ` toast--${opts.variant}` : "");
+
+    const icon = document.createElement("i");
+    icon.className = `fa-solid ${opts.icon || "fa-circle-check"}`;
+    icon.setAttribute("aria-hidden", "true");
+
+    const text = document.createElement("span");
+    text.textContent = message;
+
+    toast.appendChild(icon);
+    toast.appendChild(text);
+    els.toastContainer.appendChild(toast);
+
+    // Force a reflow so the enter transition actually plays.
+    void toast.offsetWidth;
+    toast.classList.add("is-visible");
+
+    window.setTimeout(() => {
+      toast.classList.remove("is-visible");
+      window.setTimeout(() => toast.remove(), 350);
+    }, opts.duration || 2600);
   }
 
   /* ---------- Ambient particle background ---------- */
