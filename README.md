@@ -17,33 +17,33 @@ sees exactly what you wrote and where it's from.
 
 ---
 
-## Features
+## ✨ Features
 
-- **Interactive map of Algeria** — tap any of the 58 wilayas to zoom in,
+- 🗺️ **Interactive map of Algeria** — tap any of the 58 wilayas to zoom in,
   or pick one from the dropdown. Every selection gets a satisfying beep and
   a little radar-style pulse animation.
-- **Arabic & English** — switch languages with one tap; the whole app,
+- 🌍 **Arabic & English** — switch languages with one tap; the whole app,
   including text direction, flips instantly.
-- **Light & dark mode** — an easy-on-the-eyes Green Forest look, day or night.
-- **Live news ticker** — a scrolling strip of local headlines under the clock.
-- **Live clock** — always know exactly what time it is where you are.
-- **Simple composer** — write your idea, event, or news update in a clean
+- 🌓 **Light & dark mode** — an easy-on-the-eyes Green Forest look, day or night.
+- 📰 **Live news ticker** — a scrolling strip of local headlines under the clock.
+- 🕒 **Live clock** — always know exactly what time it is where you are.
+- ✍️ **Simple composer** — write your idea, event, or news update in a clean
   text box, in either language.
-- **Instant shareable links** — no waiting, no server round-trip. Copy the
+- 🔗 **Instant shareable links** — no waiting, no server round-trip. Copy the
   link or use your device's native Share option.
-- **Enter a name, or stay anonymous** — the choice is yours every time you
+- 🙂 **Enter a name, or stay anonymous** — the choice is yours every time you
   post; nothing is ever recorded if you choose to stay anonymous.
-- **Start a new idea any time** — opened a link someone shared with you?
+- 🔄 **Start a new idea any time** — opened a link someone shared with you?
   A single tap clears the box and lets you write your own.
-- **A quick reminder before you post** — a short, collapsible notice about
+- ⚠️ **A quick reminder before you post** — a short, collapsible notice about
   posting responsibly and staying within Algeria's publishing regulations.
-- **Floating scroll buttons** — step through the page's key sections
+- ⬆️⬇️ **Floating scroll buttons** — step through the page's key sections
   one tap at a time, from the top all the way to the footer and back.
-- **Works everywhere** — phone, tablet, or desktop.
+- 📱 **Works everywhere** — phone, tablet, or desktop.
 
 ---
 
-## How to use it
+## 🚀 How to use it
 
 1. **Pick your wilaya** — tap it on the map, or choose it from the dropdown.
 2. **Write your pulse** — your idea, a local event, or a bit of news, in
@@ -65,7 +65,7 @@ anonymous) for your own post.
 
 ---
 
-## A note on privacy
+## 🔒 A note on privacy
 
 Algeria Pulse doesn't have a server, a database, or accounts. Every link
 contains everything it needs to display your pulse — nothing is uploaded or
@@ -74,12 +74,12 @@ attached to your link at all.
 
 ---
 
-## Author
+## 👤 Author
 
-**Developed with ♥️ by [Haitham Aouati](https://github.com/haithamaouati)**
+**Developed with 💚 by [Haitham Aouati](https://github.com/haithamaouati)**
 
 [Telegram](https://t.me/haithamaouati) · [GitHub](https://github.com/haithamaouati)
 
-## License
+## 📄 License
 
 MIT — do whatever you like, attribution appreciated.

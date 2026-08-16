@@ -16,9 +16,6 @@
       write_label: "Your idea, event, or news",
       write_placeholder: "What's happening in your wilaya?",
       map_label: "Tap a wilaya on the map",
-      detail_id: "ID",
-      detail_en: "Name (EN)",
-      detail_ar: "Name (AR)",
       output_label: "Shareable link",
       output_placeholder: "Your link will appear here…",
       footer_developed: "Developed with",
@@ -68,9 +65,6 @@
       write_label: "فكرتك أو الحدث أو الخبر",
       write_placeholder: "ما الذي يحدث في ولايتك؟",
       map_label: "اضغط على ولاية في الخريطة",
-      detail_id: "الرمز",
-      detail_en: "الاسم (EN)",
-      detail_ar: "الاسم (AR)",
       output_label: "الرابط القابل للمشاركة",
       output_placeholder: "سيظهر رابطك هنا…",
       footer_developed: "طُوّر بـ",
@@ -161,6 +155,7 @@
 
     applyLanguage(currentLang);
     hydrateFromURL();
+    updateLockState();
     resolveIdentity();
   }
 
@@ -176,11 +171,13 @@
     els.pulseText = $("#pulseText");
     els.metricUsername = $("#metricUsername");
     els.metricTimestamp = $("#metricTimestamp");
+    els.identityUserIcon = $("#identityUserIcon");
     els.mapContainer = $("#mapContainer");
     els.mapReset = $("#mapReset");
     els.detailId = $("#detailId");
-    els.detailEn = $("#detailEn");
-    els.detailAr = $("#detailAr");
+    els.detailName = $("#detailName");
+    els.provinceSelectWrap = $("#provinceSelectWrap");
+    els.mapWrap = $("#mapWrap");
     els.outputLink = $("#outputLink");
     els.copyBtn = $("#copyBtn");
     els.shareBtn = $("#shareBtn");
@@ -248,7 +245,16 @@
 
     els.newIdeaBtn.addEventListener("click", startNewIdea);
 
+    els.provinceSelectWrap.addEventListener("click", () => {
+      if (sharedView) playLockedBeep();
+    });
+
     els.provinceSelect.addEventListener("change", (e) => {
+      if (sharedView) {
+        e.target.value = currentProvinceId || "";
+        playLockedBeep();
+        return;
+      }
       if (e.target.value) {
         playMapBeep();
         selectProvince(e.target.value, { fromMap: false });
@@ -273,12 +279,12 @@
   }
 
   /* ---------- Stepped multi-section scroll (floating icons) ---------- */
-  // Down sequence (6 stops): dropdown -> text input -> map -> output -> about -> footer.
+  // Down sequence (6 stops): dropdown -> map -> text input -> output -> about -> footer.
   function getDownSteps() {
     return [
       $("#provinceSection"),
-      $("#textSection"),
       $("#mapSection"),
+      $("#textSection"),
       $("#outputSection"),
       $("#about"),
       $("#footerSection")
@@ -291,8 +297,8 @@
       $("#footerSection"),
       $("#about"),
       $("#outputSection"),
-      $("#mapSection"),
-      $("#textSection")
+      $("#textSection"),
+      $("#mapSection")
     ].filter(Boolean);
   }
 
@@ -428,9 +434,19 @@
     isAnonymous = false;
     participationTimestamp = null;
 
+    updateLockState();
     updateIdentityDisplay();
     generateLink();
     showUsernameModal();
+  }
+
+  // Reflects `sharedView` onto the map and dropdown: locked while reading
+  // someone else's shared pulse, unlocked once a new idea is started.
+  function updateLockState() {
+    const locked = sharedView;
+    if (els.provinceSelectWrap) els.provinceSelectWrap.classList.toggle("locked", locked);
+    if (els.provinceSelect) els.provinceSelect.tabIndex = locked ? -1 : 0;
+    if (els.mapWrap) els.mapWrap.classList.toggle("locked", locked);
   }
 
   function finalizeIdentity() {
@@ -474,14 +490,24 @@
         hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
       }).format(new Date(ts));
 
+    let isDisplayingAnonymous;
     if (els.metricUsername) {
       if (sharedView) {
+        isDisplayingAnonymous = !sharedAuthorLabel;
         els.metricUsername.textContent = sharedAuthorLabel || dict.anonymous_label;
       } else if (isAnonymous) {
+        isDisplayingAnonymous = true;
         els.metricUsername.textContent = dict.anonymous_label;
       } else {
+        isDisplayingAnonymous = false;
         els.metricUsername.textContent = username || dict.metric_no_user;
       }
+    }
+
+    if (els.identityUserIcon) {
+      els.identityUserIcon.className = isDisplayingAnonymous
+        ? "fa-solid fa-user-secret"
+        : "fa-solid fa-user";
     }
 
     if (els.metricTimestamp) {
@@ -603,27 +629,39 @@
 
     svgRoot.addEventListener("click", (e) => {
       const path = e.target.closest("path[id]");
-      if (path) {
-        playMapBeep();
-        selectProvince(path.id, { fromMap: true });
+      if (!path) return;
+      if (sharedView) {
+        playLockedBeep();
+        return;
       }
+      playMapBeep();
+      selectProvince(path.id, { fromMap: true });
     });
   }
 
   /* ---------- Map click audio feedback (Web Audio API) ---------- */
   let audioCtx = null;
-  function playMapBeep() {
+  function getAudioContext() {
     try {
       if (!audioCtx) {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContextClass) return;
+        if (!AudioContextClass) return null;
         audioCtx = new AudioContextClass();
       }
       if (audioCtx.state === "suspended") audioCtx.resume();
+      return audioCtx;
+    } catch (e) {
+      return null;
+    }
+  }
 
-      const now = audioCtx.currentTime;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
+  function playMapBeep() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
 
       osc.type = "sine";
       osc.frequency.setValueAtTime(880, now);
@@ -634,10 +672,41 @@
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
 
       osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      gain.connect(ctx.destination);
 
       osc.start(now);
       osc.stop(now + 0.16);
+    } catch (e) {
+      /* audio not available — fail silently */
+    }
+  }
+
+  // A distinct, lower "denied" double-blip — played when the user tries to
+  // interact with the map or dropdown while viewing a locked shared pulse.
+  function playLockedBeep() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    try {
+      const now = ctx.currentTime;
+      [0, 0.11].forEach((offset) => {
+        const t = now + offset;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "square";
+        osc.frequency.setValueAtTime(240, t);
+        osc.frequency.exponentialRampToValueAtTime(160, t + 0.08);
+
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.12, t + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(t);
+        osc.stop(t + 0.1);
+      });
     } catch (e) {
       /* audio not available — fail silently */
     }
@@ -736,12 +805,12 @@
   }
 
   function updateProvinceDetails() {
-    const dict = I18N[currentLang];
     const p = currentProvinceId ? provinceById.get(currentProvinceId) : null;
-    els.detailId.textContent = p ? p.id : "—";
-    els.detailEn.textContent = p ? p.name_en : "—";
-    els.detailAr.textContent = p ? p.name_ar : "—";
-    void dict;
+    if (els.detailId) els.detailId.textContent = p ? p.id : "—";
+    if (els.detailName) {
+      els.detailName.textContent = p ? (currentLang === "ar" ? p.name_ar : p.name_en) : "—";
+      els.detailName.setAttribute("dir", currentLang === "ar" ? "rtl" : "ltr");
+    }
   }
 
   /* ---------- Link generation ---------- */
