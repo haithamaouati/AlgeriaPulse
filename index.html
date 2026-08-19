@@ -55,9 +55,6 @@
       <button id="feedNavBtn" class="icon-btn" type="button" aria-label="Your local feed" data-i18n-aria="feed_nav_aria">
         <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
       </button>
-      <button id="analyticsNavBtn" class="icon-btn" type="button" aria-label="Your local analytics" data-i18n-aria="analytics_nav_aria">
-        <i class="fa-solid fa-chart-column" aria-hidden="true"></i>
-      </button>
     </nav>
   </header>
 
@@ -74,7 +71,7 @@
     </span>
     <div class="ticker__viewport">
       <div class="ticker__track" id="tickerTrack">
-        <span class="ticker__item" data-i18n="ticker_loading">Loading news…</span>
+        <span class="ticker__item" data-i18n="ticker_empty">Your local feed will appear here as you create or open pulses.</span>
       </div>
     </div>
   </section>
@@ -168,6 +165,13 @@
       <div class="tags-row" id="tagsRow" role="group" aria-label="Tags">
         <!-- Tag chip buttons are rendered by script.js -->
       </div>
+      <div class="tags-input-row" id="tagsInputRow">
+        <input type="text" id="customTagInput" class="tags-input" maxlength="20"
+          data-i18n-placeholder="custom_tag_placeholder" placeholder="Add your own tag…" />
+        <button id="addTagBtn" class="icon-btn small" type="button" aria-label="Add tag" data-i18n-aria="add_tag_aria">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        </button>
+      </div>
 
       <!-- Identity bar: username + participation timestamp -->
       <div class="metrics" id="identityBar">
@@ -199,18 +203,6 @@
         <button id="shareBtn" class="icon-btn" type="button" aria-label="Share link">
           <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
         </button>
-      </div>
-
-      <!-- Digital watermark / Geo-Seal -->
-      <div class="geo-seal" id="geoSeal" hidden>
-        <div class="geo-seal__ring">
-          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-        </div>
-        <div class="geo-seal__text">
-          <span class="geo-seal__brand">Algeria Pulse</span>
-          <span class="geo-seal__label" data-i18n="geo_seal_label">Geo-Seal</span>
-          <span class="geo-seal__ref" id="geoSealRef">REF ————</span>
-        </div>
       </div>
     </section>
 
@@ -266,7 +258,7 @@
     </div>
   </section>
 
-  <p class="version" id="versionTag">Version: 1.9.0</p>
+  <p class="version" id="versionTag">Version: 2.0.0</p>
 
   <!-- ============ FOOTER ============ -->
   <footer class="footer" id="footerSection">
@@ -329,31 +321,6 @@
   </div>
 </div>
 
-<!-- ============ LOCAL ANALYTICS MODAL ============ -->
-<div class="modal-overlay" id="analyticsModal" role="dialog" aria-modal="true" aria-labelledby="analyticsModalTitle" hidden>
-  <div class="modal-card glass feed-modal-card analytics-modal-card">
-    <button class="modal-close" id="analyticsCloseBtn" type="button" aria-label="Close" data-i18n-aria="feed_close_aria">
-      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-    </button>
-    <i class="fa-solid fa-chart-column modal-icon" aria-hidden="true"></i>
-    <h2 id="analyticsModalTitle" data-i18n="analytics_title">Your local analytics</h2>
-    <p class="modal-sub" data-i18n="analytics_sub">A quick look at your local feed — nothing ever leaves this device.</p>
-
-    <p class="feed-empty" id="analyticsEmpty" data-i18n="analytics_empty">Nothing to show yet — create or open a few pulses first.</p>
-
-    <div class="analytics-charts" id="analyticsCharts" hidden>
-      <div class="analytics-chart-block">
-        <h3 data-i18n="analytics_breakdown_title">Mine vs. viewed</h3>
-        <canvas id="analyticsDoughnut" role="img" aria-label="Mine versus viewed chart"></canvas>
-      </div>
-      <div class="analytics-chart-block">
-        <h3 data-i18n="analytics_top_wilayas_title">Top wilayas</h3>
-        <canvas id="analyticsBar" role="img" aria-label="Top wilayas chart"></canvas>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- ============ EXPANDED EDITOR MODAL ============ -->
 <div class="modal-overlay expand-overlay" id="expandModal" role="dialog" aria-modal="true" aria-labelledby="expandModalTitle" hidden>
   <div class="modal-card glass expand-modal-card">
@@ -392,8 +359,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 <!-- D3.js: SVG map selections, centroid math, and zoom/pan transitions -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
-<!-- Chart.js: local analytics dashboard, powered entirely by localStorage -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

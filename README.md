@@ -1,6 +1,6 @@
-# Algeria Pulse — نبض الجزائر — ⴰⵍⵊⵉⵔⵢⴰ ⴱⵓⵍⵙ
+# Algeria Pulse — نبض الجزائر
 
-![version](https://img.shields.io/badge/version-1.9.0-2E6F40)
+![version](https://img.shields.io/badge/version-2.0.0-2E6F40)
 
 Share a local idea, event, or piece of breaking news from any of Algeria's
 **58 wilayas** — as a single link you can send anywhere. No account, no
@@ -21,34 +21,30 @@ sees exactly what you wrote and where it's from.
 
 - 🗺️ **Interactive map of Algeria** — right below the wilaya dropdown, tap
   any of the 58 wilayas for a smooth, fluid zoom-in and a radar-style pulse
-  animation. The selected wilaya's code and name are shown as two neat
-  little chips underneath the map.
-- 🌍 **Three languages** — English, Arabic, and **Tamazight (Tifinagh
-  script, ⵜⵉⴼⵉⵏⴰⵖ)**. One tap cycles through all three; the layout direction
-  flips automatically for Arabic. Tamazight coverage is a first pass — a
-  handful of wilayas and the core navigation are translated so far, with
-  everything else gracefully falling back to Arabic, then English, rather
-  than showing anything inaccurate.
+  animation, with crisp, clearly visible boundaries between every wilaya.
+  The selected wilaya's code and name are shown as two neat little chips
+  underneath the map.
+- 🌍 **Arabic & English** — switch languages with one tap; the whole app,
+  including text direction, flips instantly.
 - 🌓 **Light & dark mode** — an easy-on-the-eyes Green Forest look, day or night.
-- 📰 **Live news ticker** — a scrolling strip of local headlines under the clock.
+- 📰 **A ticker that's actually yours** — a scrolling strip under the clock
+  showing your own recent local activity: pulses you've created or opened,
+  pulled straight from your local feed.
 - 🕒 **Live clock** — always know exactly what time it is where you are.
 - ✍️ **Simple composer** — write your idea, event, or news update in a clean
-  text box, in any of the three languages.
+  text box, in either language.
 - 🔎 **Expand to write comfortably** — tap the expand icon above the text
   box to pop it out into a larger, focused writing space, complete with
   live character, word, and line counts. Collapse it and your text (and
   cursor) is exactly where you left it.
-- 🏷️ **Smart tags** — flag your pulse as Urgent, an Alert, about Services,
-  or Traffic with one tap; tags travel with the link and show up for
-  whoever opens it.
+- 🏷️ **Tags — presets or your own** — flag your pulse as Urgent, an Alert,
+  about Services, or Traffic with one tap, or type any hashtag of your own
+  into the tag field. Tags travel with the link and show up for whoever
+  opens it.
 - 🔗 **Instant shareable links** — no waiting, no server round-trip.
 - 📋 **Two ways to copy** — copy the plain link, or copy a ready-to-post
   **formatted snippet** (wilaya, your message, who posted it, and the link
   all in one block) for pasting straight into social media.
-- 🛡️ **A little Geo-Seal** — once your link is ready, a small stamp-style
-  badge with a short reference code appears as a decorative, official-
-  looking touch. It's just for style — not a signature or any kind of
-  certification.
 - 🕓 **Live "time ago" stamps** — see at a glance whether a pulse was posted
   just now, an hour ago, or last week, updating in real time.
 - 🙋 **A little avatar for every poster** — a small circular badge next to
@@ -62,10 +58,6 @@ sees exactly what you wrote and where it's from.
   on your own device (never anywhere else). Open it from the clock-history
   icon in the header to search, filter (All / Mine / Viewed), reopen, or
   delete entries — and it's all just as easy to clear.
-- 📊 **Your local analytics** — a small, private dashboard (the chart icon
-  in the header) that turns your local feed into two simple charts: how
-  many pulses are yours versus ones you've viewed, and your most-visited
-  wilayas. It never leaves your device either.
 - 🙂 **Enter a name, or stay anonymous** — the choice is yours every time you
   post; nothing is ever recorded if you choose to stay anonymous.
 - 🔒 **Reading is read-only** — opened a link someone shared with you? The
@@ -86,8 +78,9 @@ sees exactly what you wrote and where it's from.
 1. **Pick your wilaya** — choose it from the dropdown, or tap it directly on
    the map right underneath.
 2. **Write your pulse** — your idea, a local event, or a bit of news, in
-   English, Arabic, or Tamazight. Need more room? Tap the expand icon.
-3. **Tag it, if it fits** — Urgent, Alert, Services, or Traffic.
+   Arabic or English. Need more room? Tap the expand icon.
+3. **Tag it, if it fits** — pick a preset (Urgent, Alert, Services, Traffic)
+   or type your own into the tag field and hit Enter.
 4. **Say who you are (or don't)** — the first time you post, you'll be asked
    for a name. You can also just continue as **Anonymous** — nothing about
    you is recorded either way.
@@ -105,13 +98,13 @@ idea** icon above the text box whenever you're ready to clear it and write
 your own — that's the moment you'll be asked for your name (or to stay
 anonymous) for your own post.
 
-### Your local feed & analytics
+### Your local feed
 
 Every pulse you write or open is quietly saved on your own device, never
 anywhere else. Tap the history icon in the header to search it, filter to
 just your own posts or ones you've viewed, reopen any entry, or clear it
-all. Tap the chart icon next to it for a quick visual breakdown of the same
-data — mine vs. viewed, and your top wilayas.
+all. The news ticker under the clock is powered by this same feed, so your
+most recent activity is always right there at the top of the page too.
 
 ---
 
@@ -119,23 +112,21 @@ data — mine vs. viewed, and your top wilayas.
 
 Algeria Pulse doesn't have a server, a database, or accounts. Every link
 contains everything it needs to display your pulse — nothing is uploaded or
-stored anywhere else. Your local feed and analytics live only in your own
-browser, on your own device — Algeria Pulse itself never sees them. If you
-choose to stay anonymous, no name is ever attached to your link at all.
+stored anywhere else. Your local feed lives only in your own browser, on
+your own device — Algeria Pulse itself never sees it. If you choose to stay
+anonymous, no name is ever attached to your link at all.
 
 ---
 
 ## 🧰 Built with
 
-Algeria Pulse is a small, dependency-light app that leans on a few focused
-open-source libraries, loaded straight from a CDN — no build step, no
-server:
+Algeria Pulse is a small, dependency-light app that leans on a couple of
+focused open-source libraries, loaded straight from a CDN — no build step,
+no server:
 
 - **[D3.js](https://d3js.org/)** powers the interactive map: locating each
   wilaya's center, and driving the smooth zoom/pan and radar-pulse
   animations.
-- **[Chart.js](https://www.chartjs.org/)** renders the local analytics
-  charts.
 - **[Howler.js](https://howlerjs.com/)** handles every sound effect —
   selection beeps, the "locked" tone, and copy/save chimes — reliably
   across browsers and devices.
