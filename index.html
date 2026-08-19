@@ -150,19 +150,29 @@
             <i class="fa-solid fa-eye" aria-hidden="true"></i>
             <span data-i18n="shared_banner">Viewing a shared pulse</span>
           </span>
+          <button id="expandTextBtn" class="icon-btn small" type="button" aria-label="Expand editor" data-i18n-aria="expand_editor_aria">
+            <i class="fa-solid fa-expand" aria-hidden="true"></i>
+          </button>
           <button id="newIdeaBtn" class="icon-btn small" type="button" aria-label="Start a new idea" data-i18n-aria="new_idea_aria">
             <i class="fa-solid fa-eraser" aria-hidden="true"></i>
           </button>
         </div>
       </div>
-      <textarea id="pulseText" class="textarea" rows="5" maxlength="500"
-        data-i18n-placeholder="write_placeholder"
-        placeholder="What's happening in your wilaya?"></textarea>
+      <div class="textarea-home" id="textareaHome">
+        <textarea id="pulseText" class="textarea" rows="5" maxlength="500"
+          data-i18n-placeholder="write_placeholder"
+          placeholder="What's happening in your wilaya?"></textarea>
+      </div>
+
+      <!-- Smart tags -->
+      <div class="tags-row" id="tagsRow" role="group" aria-label="Tags">
+        <!-- Tag chip buttons are rendered by script.js -->
+      </div>
 
       <!-- Identity bar: username + participation timestamp -->
       <div class="metrics" id="identityBar">
         <span class="metric">
-          <i class="fa-solid fa-user" id="identityUserIcon" aria-hidden="true"></i>
+          <span class="user-avatar" id="userAvatar" aria-hidden="true"></span>
           <span data-i18n="metric_user_label">User</span>: <span id="metricUsername">—</span>
           <button id="editUsernameBtn" class="edit-username-btn" type="button" aria-label="Edit username" data-i18n-aria="edit_username_aria">
             <i class="fa-solid fa-pen" aria-hidden="true"></i>
@@ -189,6 +199,18 @@
         <button id="shareBtn" class="icon-btn" type="button" aria-label="Share link">
           <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
         </button>
+      </div>
+
+      <!-- Digital watermark / Geo-Seal -->
+      <div class="geo-seal" id="geoSeal" hidden>
+        <div class="geo-seal__ring">
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        </div>
+        <div class="geo-seal__text">
+          <span class="geo-seal__brand">Algeria Pulse</span>
+          <span class="geo-seal__label" data-i18n="geo_seal_label">Geo-Seal</span>
+          <span class="geo-seal__ref" id="geoSealRef">REF ————</span>
+        </div>
       </div>
     </section>
 
@@ -244,7 +266,7 @@
     </div>
   </section>
 
-  <p class="version" id="versionTag">Version: 1.7.0</p>
+  <p class="version" id="versionTag">Version: 1.9.0</p>
 
   <!-- ============ FOOTER ============ -->
   <footer class="footer" id="footerSection">
@@ -328,6 +350,27 @@
         <h3 data-i18n="analytics_top_wilayas_title">Top wilayas</h3>
         <canvas id="analyticsBar" role="img" aria-label="Top wilayas chart"></canvas>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ EXPANDED EDITOR MODAL ============ -->
+<div class="modal-overlay expand-overlay" id="expandModal" role="dialog" aria-modal="true" aria-labelledby="expandModalTitle" hidden>
+  <div class="modal-card glass expand-modal-card">
+    <div class="expand-modal-header">
+      <h2 id="expandModalTitle" data-i18n="expand_editor_title">
+        <i class="fa-solid fa-pen-nib" aria-hidden="true"></i>
+        Write comfortably
+      </h2>
+      <button class="modal-close" id="expandCloseBtn" type="button" aria-label="Close" data-i18n-aria="feed_close_aria">
+        <i class="fa-solid fa-compress" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="expand-textarea-slot" id="expandTextareaSlot"></div>
+    <div class="metrics expand-metrics" id="expandMetrics">
+      <span class="metric"><i class="fa-solid fa-font" aria-hidden="true"></i> <span id="expandCharCount">0</span> <span data-i18n="metric_chars">chars</span></span>
+      <span class="metric"><i class="fa-solid fa-align-left" aria-hidden="true"></i> <span id="expandWordCount">0</span> <span data-i18n="metric_words">words</span></span>
+      <span class="metric"><i class="fa-solid fa-list-ol" aria-hidden="true"></i> <span id="expandLineCount">0</span> <span data-i18n="metric_lines">lines</span></span>
     </div>
   </div>
 </div>

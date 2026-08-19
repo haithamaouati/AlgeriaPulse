@@ -80,7 +80,14 @@
       analytics_empty: "Nothing to show yet — create or open a few pulses first.",
       analytics_unavailable: "The charting library didn't load, so analytics aren't available right now.",
       analytics_breakdown_title: "Mine vs. viewed",
-      analytics_top_wilayas_title: "Top wilayas"
+      analytics_top_wilayas_title: "Top wilayas",
+      metric_chars: "chars",
+      metric_words: "words",
+      metric_lines: "lines",
+      expand_editor_aria: "Expand editor",
+      expand_editor_title: "Write comfortably",
+      geo_seal_label: "Geo-Seal",
+      tags_label: "Tags"
     },
     ar: {
       app_title: "نبض الجزائر",
@@ -156,9 +163,81 @@
       analytics_empty: "لا يوجد شيء بعد — أنشئ أو افتح بضع نبضات أولاً.",
       analytics_unavailable: "تعذّر تحميل مكتبة الرسوم البيانية، لذا الإحصائيات غير متاحة الآن.",
       analytics_breakdown_title: "لك مقابل مُشاهَدة",
-      analytics_top_wilayas_title: "أكثر الولايات"
+      analytics_top_wilayas_title: "أكثر الولايات",
+      metric_chars: "حرف",
+      metric_words: "كلمة",
+      metric_lines: "سطر",
+      expand_editor_aria: "توسيع المحرر",
+      expand_editor_title: "اكتب بارتياح",
+      geo_seal_label: "الختم الجغرافي",
+      tags_label: "الوسوم"
+    },
+    /* Tamazight (Tifinagh). A first-pass, best-effort community-style
+       translation covering core navigation, short labels, and section
+       headers — see README for notes on current coverage. Any key not
+       present here simply falls back to the text already in the HTML
+       markup (English), rather than risk showing an inaccurate
+       translation for longer passages. Tifinagh is written left-to-right,
+       so this language does not switch the page to RTL. */
+    zgh: {
+      app_title: "ⴰⵍⵊⵉⵔⵢⴰ ⴱⵓⵍⵙ",
+      select_province: "ⴼⵔⵏ ⵜⴰⵡⵉⵍⴰⵢⵜ ⵏⵏⴽ",
+      select_placeholder: "ⴼⵔⵏ ⵜⴰⵡⵉⵍⴰⵢⵜ…",
+      notice_title: "ⴰⵍⵖⵓ",
+      write_label: "ⵜⴰⴱⵔⴰⵜ ⵏⵏⴽ",
+      map_label: "ⵜⴰⴽⴰⵔⴹⴰ ⵏ ⵍⵣⴰⵢⴻⵔ",
+      output_label: "ⴰⵙⵙⵓⴼⵖ",
+      footer_by: "ⵙ ⵓⴼⵓⵙ ⵏ",
+      copied: "ⵢⵜⵜⵡⴰⵏⵖⵍ ⵓⵙⴻⴳⵎⵉ!",
+      about_title: "ⵖⴻⴼ ⴰⵍⵊⵉⵔⵢⴰ ⴱⵓⵍⵙ",
+      feature_map: "ⵜⴰⴽⴰⵔⴹⴰ ⵜⵓⵙⵙⵏⵉⵜ ⵏ 58 ⵜⵡⵉⵍⴰⵢⵉⵏ",
+      about_nav_aria: "ⵖⴻⴼ ⴰⵍⵊⵉⵔⵢⴰ ⴱⵓⵍⵙ",
+      metric_user_label: "ⴰⵎⵙⵜⵎⵍ",
+      metric_time_label: "ⴰⴽⵓⴷ",
+      modal_submit: "ⴽⵎⵎⵍ",
+      modal_error: "ⴰⵔⴰ ⵙⵉⵏ ⵉⵙⴽⴽⵉⵍⵏ ⵏⵉⵖ ⵓⴳⴰⵔ.",
+      edit_username_aria: "ⴱⴷⴷⵍ ⴰⵎⵜⵎⵍ",
+      modal_anonymous: "ⴽⵎⵎⵍ ⴷ ⵓⵎⵢⴰⵏⵓ",
+      anonymous_label: "ⴰⵎⵢⴰⵏⵓ",
+      new_idea_aria: "ⵜⵓⴽⵜⵉ ⵜⴰⵎⴰⵢⵏⵓⵜ",
+      feed_nav_aria: "ⴰⵎⵣⵔⵓⵢ ⵉⵏⵓ",
+      feed_close_aria: "ⵎⴷⵍ",
+      feed_title: "ⴰⵎⵣⵔⵓⵢ ⵉⵏⵓ",
+      feed_search_placeholder: "ⵔⵣⵓ ⴳ ⵓⵎⵣⵔⵓⵢ…",
+      feed_filter_all: "ⴰⴽⴽⵯ",
+      feed_filter_mine: "ⵉⵏⵓ",
+      feed_filter_viewed: "ⵜⵡⴰⵍⵉⵜ",
+      feed_clear: "ⵙⴼⴹ ⴰⵎⵣⵔⵓⵢ",
+      feed_badge_created: "ⵉⵏⵓ",
+      feed_badge_viewed: "ⵜⵡⴰⵍⵉⵜ",
+      copy_snippet_aria: "ⵏⵖⵍ ⴰⴱⵟⵟⴰ",
+      snippet_copied: "ⵢⵜⵜⵡⴰⵏⵖⵍ ⵓⴱⵟⵟⴰ!",
+      analytics_nav_aria: "ⵜⵉⵙⵙⵓⵜⵍⵉⵏ ⵉⵏⵓ",
+      analytics_title: "ⵜⵉⵙⵙⵓⵜⵍⵉⵏ ⵉⵏⵓ",
+      analytics_breakdown_title: "ⵉⵏⵓ / ⵜⵡⴰⵍⵉⵜ",
+      analytics_top_wilayas_title: "ⵜⵉⵡⵉⵍⴰⵢⵉⵏ ⵜⵉⵎⵣⵡⴰⵔⴰ",
+      metric_chars: "ⵉⵙⴽⴽⵉⵍⵏ",
+      metric_words: "ⵉⵡⴰⵍⵉⵡⵏ",
+      metric_lines: "ⵉⵣⵉⵔⵉⴳⵏ",
+      expand_editor_aria: "ⵙⵎⵖⵔ",
+      expand_editor_title: "ⴰⵔⵓ ⵙ ⵜⴰⵍⴰⵙⴰ",
+      geo_seal_label: "ⴰⵅⴰⵜⵎ ⴰⵎⴰⴹⵍⴰⵏ",
+      tags_label: "ⵜⵉⴱⴹⵉⵡⵉⵏ"
     }
   };
+
+  // Cycle order for the language toggle button.
+  const LANGUAGES = ["en", "ar", "zgh"];
+
+  // Smart hashtags/tags catalog. Tamazight UI falls back to the Arabic
+  // label for tag text (see README) since these are specific vocabulary
+  // items, not yet part of the core-label translation set.
+  const TAGS = [
+    { id: "urgent", en: "Urgent", ar: "عاجل" },
+    { id: "alert", en: "Alert", ar: "تنبيه" },
+    { id: "services", en: "Services", ar: "خدمات" },
+    { id: "traffic", en: "Traffic", ar: "مرور" }
+  ];
 
   let currentLang = "en";
   let provinces = [];
@@ -171,9 +250,60 @@
   let sharedView = false;
   let sharedAuthorLabel = null;
   let sharedAuthorTimestamp = null;
+  let selectedTags = [];
+  let sharedTags = [];
   let feedFilter = "all";
   let feedSearchTerm = "";
   let feedClearArmed = false;
+
+  // Resolves a value for the active language with graceful fallback:
+  // Tamazight falls back to Arabic, Arabic falls back to English.
+  function pickLang(en, ar, zgh) {
+    if (currentLang === "zgh") return zgh || ar || en || "";
+    if (currentLang === "ar") return ar || en || "";
+    return en || ar || "";
+  }
+
+  function localizedProvinceName(p) {
+    if (!p) return "";
+    return pickLang(p.name_en, p.name_ar, p.name_zgh);
+  }
+
+  // Tag chips always use a stable id (e.g. "urgent") as their canonical
+  // value in URLs/local storage, so filtering and matching stay consistent
+  // no matter which UI language a post was created or is being viewed in.
+  // Only the *displayed* hashtag text is localized.
+  function tagLabel(id) {
+    const def = TAGS.find((t) => t.id === id);
+    if (!def) return id;
+    // Tamazight currently shares the Arabic hashtag label (see README) —
+    // these are specific vocabulary items, not yet part of the core set.
+    return currentLang === "en" ? def.en : def.ar;
+  }
+
+  function renderTagChips() {
+    if (!els.tagsRow) return;
+    els.tagsRow.innerHTML = "";
+
+    if (sharedView) {
+      sharedTags.forEach((id) => {
+        const chip = document.createElement("span");
+        chip.className = "tag-chip active";
+        chip.textContent = `#${tagLabel(id)}`;
+        els.tagsRow.appendChild(chip);
+      });
+      return;
+    }
+
+    TAGS.forEach((tagDef) => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "tag-chip" + (selectedTags.includes(tagDef.id) ? " active" : "");
+      chip.dataset.tag = tagDef.id;
+      chip.textContent = `#${tagLabel(tagDef.id)}`;
+      els.tagsRow.appendChild(chip);
+    });
+  }
   let svgRoot = null;
   let mapGroup = null;
   let mapGroupSel = null;
@@ -230,9 +360,10 @@
     els.noticeToggle = $("#noticeToggle");
     els.noticeBody = $("#noticeBody");
     els.pulseText = $("#pulseText");
+    els.textareaHome = $("#textareaHome");
     els.metricUsername = $("#metricUsername");
     els.metricTimestamp = $("#metricTimestamp");
-    els.identityUserIcon = $("#identityUserIcon");
+    els.userAvatar = $("#userAvatar");
     els.mapContainer = $("#mapContainer");
     els.mapReset = $("#mapReset");
     els.detailId = $("#detailId");
@@ -273,12 +404,25 @@
     els.analyticsCharts = $("#analyticsCharts");
     els.analyticsDoughnutCanvas = $("#analyticsDoughnut");
     els.analyticsBarCanvas = $("#analyticsBar");
+    els.tagsRow = $("#tagsRow");
+    els.geoSeal = $("#geoSeal");
+    els.geoSealRef = $("#geoSealRef");
+    els.expandTextBtn = $("#expandTextBtn");
+    els.expandModal = $("#expandModal");
+    els.expandModalTitle = $("#expandModalTitle");
+    els.expandCloseBtn = $("#expandCloseBtn");
+    els.expandTextareaSlot = $("#expandTextareaSlot");
+    els.expandMetrics = $("#expandMetrics");
+    els.expandCharCount = $("#expandCharCount");
+    els.expandWordCount = $("#expandWordCount");
+    els.expandLineCount = $("#expandLineCount");
   }
 
   /* ---------- Static event bindings ---------- */
   function bindStaticEvents() {
     els.langToggle.addEventListener("click", () => {
-      applyLanguage(currentLang === "en" ? "ar" : "en");
+      const nextIndex = (LANGUAGES.indexOf(currentLang) + 1) % LANGUAGES.length;
+      applyLanguage(LANGUAGES[nextIndex]);
     });
 
     els.themeToggle.addEventListener("click", toggleTheme);
@@ -339,6 +483,21 @@
 
     els.pulseText.addEventListener("input", () => {
       generateLink();
+      updateExpandMetrics();
+    });
+
+    els.tagsRow.addEventListener("click", (e) => {
+      const chip = e.target.closest(".tag-chip");
+      if (!chip || chip.disabled) return;
+      const tag = chip.dataset.tag;
+      if (!tag) return;
+      if (selectedTags.includes(tag)) {
+        selectedTags = selectedTags.filter((t) => t !== tag);
+      } else {
+        selectedTags.push(tag);
+      }
+      chip.classList.toggle("active", selectedTags.includes(tag));
+      generateLink();
     });
 
     els.mapReset.addEventListener("click", resetMapView);
@@ -376,6 +535,12 @@
     els.analyticsCloseBtn.addEventListener("click", closeAnalyticsModal);
     els.analyticsModal.addEventListener("click", (e) => {
       if (e.target === els.analyticsModal) closeAnalyticsModal();
+    });
+
+    els.expandTextBtn.addEventListener("click", openExpandModal);
+    els.expandCloseBtn.addEventListener("click", closeExpandModal);
+    els.expandModal.addEventListener("click", (e) => {
+      if (e.target === els.expandModal) closeExpandModal();
     });
   }
 
@@ -479,23 +644,32 @@
   function applyLanguage(lang) {
     currentLang = lang;
     const dict = I18N[lang];
+    // Tifinagh (Tamazight) is written left-to-right, same as English —
+    // only Arabic flips the page to RTL.
     const dir = lang === "ar" ? "rtl" : "ltr";
-    document.documentElement.setAttribute("lang", lang);
+    document.documentElement.setAttribute("lang", lang === "zgh" ? "zgh" : lang);
     document.documentElement.setAttribute("dir", dir);
-    els.langToggleLabel.textContent = lang === "en" ? "AR" : "EN";
+    const nextLabels = { en: "AR", ar: "ⵣ", zgh: "EN" };
+    els.langToggleLabel.textContent = nextLabels[lang] || "EN";
 
     document.querySelectorAll("[data-i18n]").forEach((node) => {
       if (node === els.feedClearBtn && feedClearArmed) return;
       const key = node.getAttribute("data-i18n");
-      if (dict[key]) node.textContent = dict[key];
+      // Any key missing from a partially-translated language (currently
+      // Tamazight) falls back to English rather than leaving stale text
+      // from whatever language was active before.
+      const value = dict[key] || I18N.en[key];
+      if (value) node.textContent = value;
     });
     document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
       const key = node.getAttribute("data-i18n-placeholder");
-      if (dict[key]) node.setAttribute("placeholder", dict[key]);
+      const value = dict[key] || I18N.en[key];
+      if (value) node.setAttribute("placeholder", value);
     });
     document.querySelectorAll("[data-i18n-aria]").forEach((node) => {
       const key = node.getAttribute("data-i18n-aria");
-      if (dict[key]) node.setAttribute("aria-label", dict[key]);
+      const value = dict[key] || I18N.en[key];
+      if (value) node.setAttribute("aria-label", value);
     });
 
     populateSelect();
@@ -504,6 +678,7 @@
     updateIdentityDisplay();
     renderTicker();
     refreshUsernameModalCopy();
+    renderTagChips();
     if (els.feedModal && !els.feedModal.hidden) renderFeedList();
     if (els.analyticsModal && !els.analyticsModal.hidden) renderAnalytics();
   }
@@ -531,6 +706,8 @@
     sharedView = false;
     sharedAuthorLabel = null;
     sharedAuthorTimestamp = null;
+    sharedTags = [];
+    selectedTags = [];
 
     els.pulseText.readOnly = false;
     els.pulseText.value = "";
@@ -541,6 +718,7 @@
 
     updateLockState();
     updateIdentityDisplay();
+    renderTagChips();
     generateLink();
     showUsernameModal();
   }
@@ -596,24 +774,23 @@
       }).format(new Date(ts));
 
     let isDisplayingAnonymous;
+    let displayName = "";
     if (els.metricUsername) {
       if (sharedView) {
         isDisplayingAnonymous = !sharedAuthorLabel;
+        displayName = sharedAuthorLabel || "";
         els.metricUsername.textContent = sharedAuthorLabel || dict.anonymous_label;
       } else if (isAnonymous) {
         isDisplayingAnonymous = true;
         els.metricUsername.textContent = dict.anonymous_label;
       } else {
         isDisplayingAnonymous = false;
+        displayName = username || "";
         els.metricUsername.textContent = username || dict.metric_no_user;
       }
     }
 
-    if (els.identityUserIcon) {
-      els.identityUserIcon.className = isDisplayingAnonymous
-        ? "fa-solid fa-user-secret"
-        : "fa-solid fa-user";
-    }
+    updateAvatar(displayName, isDisplayingAnonymous);
 
     if (els.metricTimestamp) {
       const ts = sharedView ? sharedAuthorTimestamp : participationTimestamp;
@@ -628,6 +805,58 @@
 
     if (els.editUsernameBtn) els.editUsernameBtn.hidden = sharedView;
     if (els.sharedBadge) els.sharedBadge.hidden = !sharedView;
+  }
+
+  // Renders the circular avatar in the identity bar: the first letter of
+  // the display name (uppercased) for a named user/author, or the
+  // user-secret icon when anonymous / no name is available. Built with
+  // DOM methods rather than innerHTML so arbitrary usernames are always
+  // treated as plain text, never markup.
+  function updateAvatar(displayName, anonymous) {
+    if (!els.userAvatar) return;
+    els.userAvatar.innerHTML = "";
+    els.userAvatar.classList.toggle("user-avatar--anon", !!anonymous || !displayName);
+
+    if (anonymous || !displayName) {
+      const icon = document.createElement("i");
+      icon.className = "fa-solid fa-user-secret";
+      icon.setAttribute("aria-hidden", "true");
+      els.userAvatar.appendChild(icon);
+    } else {
+      const initial = document.createElement("span");
+      initial.textContent = displayName.trim().charAt(0).toUpperCase();
+      els.userAvatar.appendChild(initial);
+    }
+  }
+
+  /* ---------- Expandable writing workspace ----------
+     The #pulseText textarea is the same live DOM node throughout — opening
+     the expanded workspace physically relocates it into the modal (so
+     value, cursor position, readOnly state, and every existing listener
+     keep working untouched), and closing moves it straight back into its
+     home slot in the text-input card. */
+  function openExpandModal() {
+    if (!els.pulseText || !els.expandTextareaSlot || !els.expandModal) return;
+    els.expandTextareaSlot.appendChild(els.pulseText);
+    els.expandModal.hidden = false;
+    updateExpandMetrics();
+    window.setTimeout(() => els.pulseText.focus(), 60);
+  }
+
+  function closeExpandModal() {
+    if (!els.pulseText || !els.textareaHome || !els.expandModal) return;
+    els.textareaHome.appendChild(els.pulseText);
+    els.expandModal.hidden = true;
+  }
+
+  function updateExpandMetrics() {
+    if (!els.pulseText) return;
+    const val = els.pulseText.value;
+    if (els.expandCharCount) els.expandCharCount.textContent = val.length;
+    const words = val.trim().length ? val.trim().split(/\s+/).length : 0;
+    if (els.expandWordCount) els.expandWordCount.textContent = words;
+    const lines = val.length ? val.split(/\n/).length : 0;
+    if (els.expandLineCount) els.expandLineCount.textContent = lines;
   }
 
   /* ---------- Live clock ---------- */
@@ -709,9 +938,9 @@
       const opt = document.createElement("option");
       opt.value = p.id;
       const num = String(p.number).padStart(2, "0");
-      opt.textContent = currentLang === "ar"
-        ? `${num} — ${p.name_ar} (${p.name_en})`
-        : `${num} — ${p.name_en} (${p.name_ar})`;
+      const primary = localizedProvinceName(p);
+      const secondary = currentLang === "ar" ? p.name_en : p.name_ar;
+      opt.textContent = `${num} — ${primary} (${secondary})`;
       els.provinceSelect.appendChild(opt);
     });
 
@@ -1077,9 +1306,36 @@
     const p = currentProvinceId ? provinceById.get(currentProvinceId) : null;
     if (els.detailId) els.detailId.textContent = p ? p.id : "—";
     if (els.detailName) {
-      els.detailName.textContent = p ? (currentLang === "ar" ? p.name_ar : p.name_en) : "—";
+      els.detailName.textContent = p ? localizedProvinceName(p) : "—";
       els.detailName.setAttribute("dir", currentLang === "ar" ? "rtl" : "ltr");
     }
+  }
+
+  /* ---------- Digital watermark / Geo-Seal ----------
+     A cosmetic, app-branded stamp shown once a link has actually been
+     generated — it is NOT a cryptographic signature or any form of
+     official government certification. The "reference code" is just a
+     short deterministic hash of the pulse's own content, purely for a
+     consistent, official-looking visual touch. */
+  function buildSealRef(provinceId, timestamp, text) {
+    let hash = 0;
+    const seed = `${provinceId}|${timestamp}|${text}`;
+    for (let i = 0; i < seed.length; i++) {
+      hash = (hash << 5) - hash + seed.charCodeAt(i);
+      hash |= 0;
+    }
+    const hex = Math.abs(hash).toString(16).toUpperCase().padStart(8, "0").slice(0, 8);
+    return `${provinceId} · ${hex.slice(0, 4)}-${hex.slice(4)}`;
+  }
+
+  function updateGeoSeal(provinceId, timestamp, text) {
+    if (!els.geoSeal) return;
+    if (!provinceId || !timestamp || !text) {
+      els.geoSeal.hidden = true;
+      return;
+    }
+    if (els.geoSealRef) els.geoSealRef.textContent = `REF ${buildSealRef(provinceId, timestamp, text)}`;
+    els.geoSeal.hidden = false;
   }
 
   /* ---------- Link generation ---------- */
@@ -1104,6 +1360,7 @@
     const hasIdentity = isAnonymous || !!username;
     if (sharedView || !currentProvinceId || !text || !hasIdentity) {
       els.outputLink.value = "";
+      updateGeoSeal(null, null, null);
       return;
     }
     const url = new URL(window.location.href);
@@ -1112,8 +1369,12 @@
     if (!isAnonymous) url.searchParams.set("u", username);
     url.searchParams.set("t", (participationTimestamp || Date.now()).toString());
     url.searchParams.set("p", currentProvinceId);
+    if (selectedTags.length) url.searchParams.set("tags", selectedTags.join(","));
     url.searchParams.set("d", b64EncodeUnicode(text));
     els.outputLink.value = url.toString();
+
+    const ts = participationTimestamp || Date.now();
+    updateGeoSeal(currentProvinceId, ts, text);
 
     const p = provinceById.get(currentProvinceId);
     saveFeedEntry({
@@ -1123,10 +1384,12 @@
       provinceId: currentProvinceId,
       provinceName_en: p ? p.name_en : "",
       provinceName_ar: p ? p.name_ar : "",
+      provinceName_zgh: p ? p.name_zgh || "" : "",
       text,
       username: isAnonymous ? null : username,
       isAnonymous,
-      timestamp: participationTimestamp || Date.now()
+      tags: selectedTags.slice(),
+      timestamp: ts
     });
   }
 
@@ -1136,6 +1399,7 @@
     const u = params.get("u");
     const t = params.get("t");
     const d = params.get("d");
+    const tagsParam = params.get("tags");
 
     if (p && provinceById.has(p)) {
       selectProvince(p, { fromMap: false });
@@ -1148,6 +1412,8 @@
         sharedView = true;
         sharedAuthorLabel = u ? decodeURIComponent(u) : null;
         sharedAuthorTimestamp = t ? Number(t) : null;
+        sharedTags = tagsParam ? tagsParam.split(",").filter(Boolean) : [];
+        renderTagChips();
 
         const province = p ? provinceById.get(p) : null;
         saveFeedEntry({
@@ -1157,9 +1423,11 @@
           provinceId: p || null,
           provinceName_en: province ? province.name_en : "",
           provinceName_ar: province ? province.name_ar : "",
+          provinceName_zgh: province ? province.name_zgh || "" : "",
           text: els.pulseText.value,
           username: sharedAuthorLabel,
           isAnonymous: !sharedAuthorLabel,
+          tags: sharedTags.slice(),
           timestamp: sharedAuthorTimestamp || Date.now()
         });
       } catch (e) {
@@ -1276,6 +1544,10 @@
     els.feedModal.hidden = true;
   }
 
+  function feedEntryWilayaName(entry) {
+    return pickLang(entry.provinceName_en, entry.provinceName_ar, entry.provinceName_zgh);
+  }
+
   function renderFeedList() {
     if (!els.feedList) return;
     const dict = I18N[currentLang];
@@ -1285,8 +1557,9 @@
       if (feedFilter === "mine" && entry.type !== "created") return false;
       if (feedFilter === "viewed" && entry.type !== "viewed") return false;
       if (feedSearchTerm) {
-        const wilayaName = currentLang === "ar" ? entry.provinceName_ar : entry.provinceName_en;
-        const haystack = `${entry.text || ""} ${wilayaName || ""} ${entry.username || ""}`.toLowerCase();
+        const wilayaName = feedEntryWilayaName(entry);
+        const tagText = (entry.tags || []).map((id) => tagLabel(id)).join(" ");
+        const haystack = `${entry.text || ""} ${wilayaName || ""} ${entry.username || ""} ${tagText}`.toLowerCase();
         if (!haystack.includes(feedSearchTerm)) return false;
       }
       return true;
@@ -1324,8 +1597,7 @@
 
     const wilaya = document.createElement("span");
     wilaya.className = "feed-item__wilaya";
-    const wilayaName = currentLang === "ar" ? entry.provinceName_ar : entry.provinceName_en;
-    wilaya.textContent = wilayaName || "—";
+    wilaya.textContent = feedEntryWilayaName(entry) || "—";
 
     top.appendChild(badge);
     top.appendChild(wilaya);
@@ -1333,6 +1605,21 @@
     const text = document.createElement("p");
     text.className = "feed-item__text";
     text.textContent = entry.text || "";
+
+    body.appendChild(top);
+    body.appendChild(text);
+
+    if (entry.tags && entry.tags.length) {
+      const tagsRow = document.createElement("div");
+      tagsRow.className = "feed-item__tags";
+      entry.tags.forEach((id) => {
+        const tagChip = document.createElement("span");
+        tagChip.className = "feed-item__tag";
+        tagChip.textContent = `#${tagLabel(id)}`;
+        tagsRow.appendChild(tagChip);
+      });
+      body.appendChild(tagsRow);
+    }
 
     const meta = document.createElement("div");
     meta.className = "feed-item__meta";
@@ -1344,8 +1631,6 @@
     timeSpan.textContent = relativeTimeString(entry.timestamp) || "";
     meta.appendChild(timeSpan);
 
-    body.appendChild(top);
-    body.appendChild(text);
     body.appendChild(meta);
 
     const deleteBtn = document.createElement("button");
@@ -1543,10 +1828,11 @@
     if (!els.outputLink.value) return null;
     const dict = I18N[currentLang];
     const p = currentProvinceId ? provinceById.get(currentProvinceId) : null;
-    const wilayaName = p ? (currentLang === "ar" ? p.name_ar : p.name_en) : "";
+    const wilayaName = p ? localizedProvinceName(p) : "";
     const text = els.pulseText.value.trim();
     const who = isAnonymous ? dict.anonymous_label : (username || "");
-    return `[${dict.app_title} - ${wilayaName}] ${dict.write_label}: ${text} | ${dict.metric_user_label}: ${who} | ${dict.output_label}: ${els.outputLink.value}`;
+    const tagsText = selectedTags.length ? ` ${selectedTags.map((id) => `#${tagLabel(id)}`).join(" ")}` : "";
+    return `[${dict.app_title} - ${wilayaName}] ${dict.write_label}: ${text}${tagsText} | ${dict.metric_user_label}: ${who} | ${dict.output_label}: ${els.outputLink.value}`;
   }
 
   async function copySnippet() {
@@ -1587,9 +1873,10 @@
     if (navigator.share) {
       try {
         const p = currentProvinceId ? provinceById.get(currentProvinceId) : null;
-        const wilayaName = p ? (currentLang === "ar" ? p.name_ar : p.name_en) : "";
+        const wilayaName = p ? localizedProvinceName(p) : "";
         const text = els.pulseText.value.trim();
-        const shareText = `[${dict.app_title} - ${wilayaName}] ${text}`;
+        const tagsText = selectedTags.length ? ` ${selectedTags.map((id) => `#${tagLabel(id)}`).join(" ")}` : "";
+        const shareText = `[${dict.app_title} - ${wilayaName}] ${text}${tagsText}`;
         await navigator.share({ title: dict.app_title, text: shareText, url: els.outputLink.value });
         playCopyBeep();
       } catch (e) {

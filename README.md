@@ -1,6 +1,6 @@
-# Algeria Pulse — نبض الجزائر
+# Algeria Pulse — نبض الجزائر — ⴰⵍⵊⵉⵔⵢⴰ ⴱⵓⵍⵙ
 
-![version](https://img.shields.io/badge/version-1.7.0-2E6F40)
+![version](https://img.shields.io/badge/version-1.9.0-2E6F40)
 
 Share a local idea, event, or piece of breaking news from any of Algeria's
 **58 wilayas** — as a single link you can send anywhere. No account, no
@@ -23,19 +23,37 @@ sees exactly what you wrote and where it's from.
   any of the 58 wilayas for a smooth, fluid zoom-in and a radar-style pulse
   animation. The selected wilaya's code and name are shown as two neat
   little chips underneath the map.
-- 🌍 **Arabic & English** — switch languages with one tap; the whole app,
-  including text direction, flips instantly.
+- 🌍 **Three languages** — English, Arabic, and **Tamazight (Tifinagh
+  script, ⵜⵉⴼⵉⵏⴰⵖ)**. One tap cycles through all three; the layout direction
+  flips automatically for Arabic. Tamazight coverage is a first pass — a
+  handful of wilayas and the core navigation are translated so far, with
+  everything else gracefully falling back to Arabic, then English, rather
+  than showing anything inaccurate.
 - 🌓 **Light & dark mode** — an easy-on-the-eyes Green Forest look, day or night.
 - 📰 **Live news ticker** — a scrolling strip of local headlines under the clock.
 - 🕒 **Live clock** — always know exactly what time it is where you are.
 - ✍️ **Simple composer** — write your idea, event, or news update in a clean
-  text box, in either language.
+  text box, in any of the three languages.
+- 🔎 **Expand to write comfortably** — tap the expand icon above the text
+  box to pop it out into a larger, focused writing space, complete with
+  live character, word, and line counts. Collapse it and your text (and
+  cursor) is exactly where you left it.
+- 🏷️ **Smart tags** — flag your pulse as Urgent, an Alert, about Services,
+  or Traffic with one tap; tags travel with the link and show up for
+  whoever opens it.
 - 🔗 **Instant shareable links** — no waiting, no server round-trip.
 - 📋 **Two ways to copy** — copy the plain link, or copy a ready-to-post
   **formatted snippet** (wilaya, your message, who posted it, and the link
   all in one block) for pasting straight into social media.
+- 🛡️ **A little Geo-Seal** — once your link is ready, a small stamp-style
+  badge with a short reference code appears as a decorative, official-
+  looking touch. It's just for style — not a signature or any kind of
+  certification.
 - 🕓 **Live "time ago" stamps** — see at a glance whether a pulse was posted
   just now, an hour ago, or last week, updating in real time.
+- 🙋 **A little avatar for every poster** — a small circular badge next to
+  the username shows the first letter of their name, or a friendly
+  incognito icon if they posted anonymously.
 - 🔔 **Toast confirmations & crisp sound cues** — a friendly little
   notification and a distinct chime confirm every copy, share, and save —
   with a lower, different tone if you try to interact with something
@@ -49,11 +67,10 @@ sees exactly what you wrote and where it's from.
   many pulses are yours versus ones you've viewed, and your most-visited
   wilayas. It never leaves your device either.
 - 🙂 **Enter a name, or stay anonymous** — the choice is yours every time you
-  post; nothing is ever recorded if you choose to stay anonymous, and
-  anonymous posts are clearly marked with an incognito icon.
+  post; nothing is ever recorded if you choose to stay anonymous.
 - 🔒 **Reading is read-only** — opened a link someone shared with you? The
   map and dropdown lock while you're viewing it, so you can't accidentally
-  overwrite their pulse.
+  overwrite their pulse — trying anyway plays a distinct "locked" sound.
 - 🔄 **Start a new idea any time** — a single tap clears the box, unlocks
   everything, and lets you write your own.
 - ⚠️ **A quick reminder before you post** — a short, collapsible notice about
@@ -69,23 +86,24 @@ sees exactly what you wrote and where it's from.
 1. **Pick your wilaya** — choose it from the dropdown, or tap it directly on
    the map right underneath.
 2. **Write your pulse** — your idea, a local event, or a bit of news, in
-   Arabic or English.
-3. **Say who you are (or don't)** — the first time you post, you'll be asked
+   English, Arabic, or Tamazight. Need more room? Tap the expand icon.
+3. **Tag it, if it fits** — Urgent, Alert, Services, or Traffic.
+4. **Say who you are (or don't)** — the first time you post, you'll be asked
    for a name. You can also just continue as **Anonymous** — nothing about
    you is recorded either way.
-4. **Get your link** — it's generated instantly, no waiting.
-5. **Share it** — copy the plain link, copy a formatted snippet ready for
+5. **Get your link** — it's generated instantly, no waiting.
+6. **Share it** — copy the plain link, copy a formatted snippet ready for
    social media, or tap the share icon to send it straight through any app.
 
 ### Opened a link someone sent you?
 
-You'll see their wilaya, their message, who shared it (or "Anonymous"), and
-roughly when — "5 minutes ago", "yesterday", and so on. The map, dropdown,
-and text box are all locked while you're reading, so there's no risk of
-changing someone else's pulse by accident. Tap the **new idea** icon above
-the text box whenever you're ready to clear it and write your own — that's
-the moment you'll be asked for your name (or to stay anonymous) for your
-own post.
+You'll see their wilaya, their message, any tags they added, who shared it
+(or "Anonymous"), and roughly when — "5 minutes ago", "yesterday", and so
+on. The map, dropdown, and text box are all locked while you're reading, so
+there's no risk of changing someone else's pulse by accident. Tap the **new
+idea** icon above the text box whenever you're ready to clear it and write
+your own — that's the moment you'll be asked for your name (or to stay
+anonymous) for your own post.
 
 ### Your local feed & analytics
 

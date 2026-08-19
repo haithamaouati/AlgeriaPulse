@@ -498,6 +498,36 @@ body::after {
   background: rgba(149, 213, 178, 0.08);
 }
 
+/* Smart hashtags/tags */
+.tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--surface-border);
+  background: var(--input-bg);
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.tag-chip:hover { border-color: var(--primary-light); }
+.tag-chip.active {
+  background: var(--gradient);
+  color: #fff;
+  border-color: transparent;
+}
+.tag-chip[disabled] { opacity: 0.45; cursor: not-allowed; }
+
 .metrics {
   display: flex;
   flex-wrap: wrap;
@@ -516,6 +546,28 @@ body::after {
 }
 .metric i { color: var(--primary-light); }
 .metric span#metricUsername, .metric span#metricTimestamp { color: var(--text); }
+
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--gradient);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  line-height: 1;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px var(--surface-border);
+}
+.user-avatar--anon {
+  background: var(--input-bg);
+  color: var(--text-muted);
+  box-shadow: 0 0 0 1px var(--surface-border) inset;
+}
+.user-avatar i { color: inherit; font-size: 0.62rem; }
 
 .edit-username-btn {
   display: inline-flex;
@@ -682,6 +734,60 @@ body::after {
   color: var(--text-muted);
   font-family: var(--font);
   font-size: 0.85rem;
+}
+
+/* Digital watermark / Geo-Seal — a cosmetic, app-branded stamp (not a
+   government document or official certification) shown once a link has
+   actually been generated. */
+.geo-seal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--surface-border);
+  background: var(--input-bg);
+  opacity: 0.9;
+}
+.geo-seal__ring {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-light);
+  font-size: 1rem;
+  transform: rotate(-8deg);
+  background: var(--surface-strong);
+}
+.geo-seal__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.35;
+}
+.geo-seal__brand {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  text-transform: uppercase;
+}
+.geo-seal__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary-light);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.geo-seal__ref {
+  font-size: 0.7rem;
+  font-family: "Courier New", monospace;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
 }
 
 /* ============ ABOUT / FEATURES ============ */
@@ -1120,6 +1226,52 @@ body::after {
   max-height: 220px;
 }
 
+/* ============ EXPANDED EDITOR MODAL ============ */
+.expand-overlay .expand-modal-card {
+  max-width: 640px;
+  width: 100%;
+  height: min(80vh, 640px);
+  align-items: stretch;
+  text-align: start;
+  padding: 22px 22px 18px;
+}
+.expand-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.expand-modal-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.expand-modal-header h2 i { color: var(--primary-light); }
+.expand-modal-header .modal-close { position: static; }
+
+.expand-textarea-slot {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.expand-textarea-slot .textarea {
+  flex: 1;
+  min-height: 0;
+  resize: none;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.expand-metrics {
+  margin-top: 10px;
+  padding-top: 10px;
+  justify-content: center;
+}
+
 /* ============ TOAST NOTIFICATIONS ============ */
 .toast-container {
   position: fixed;
@@ -1174,4 +1326,5 @@ body::after {
   .about { border-radius: var(--radius-md); }
   .feed-modal-card { max-height: 90vh; padding: 24px 18px; }
   .toast-container { bottom: 82px; width: 94vw; }
+  .expand-overlay .expand-modal-card { height: 90vh; padding: 18px 16px 14px; }
 }
