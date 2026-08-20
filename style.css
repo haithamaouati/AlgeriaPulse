@@ -256,9 +256,36 @@ body::after {
 }
 .scroll-fab:active { transform: translateY(0); }
 
+/* Floating "new idea" action button */
+.new-idea-fab {
+  position: fixed;
+  inset-inline-start: 18px;
+  bottom: 22px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 999px;
+  background: var(--gradient);
+  color: #fff;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(27, 67, 50, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.new-idea-fab i { font-size: 0.85rem; }
+.new-idea-fab:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(27, 67, 50, 0.45); }
+.new-idea-fab:active { transform: translateY(0); }
+
 @media (max-width: 520px) {
   .scroll-fab-group { inset-inline-end: 12px; bottom: 14px; }
   .scroll-fab { width: 38px; height: 38px; font-size: 0.9rem; }
+  .new-idea-fab { inset-inline-start: 12px; bottom: 14px; padding: 11px 16px; font-size: 0.8rem; }
+  .new-idea-fab span { display: none; }
 }
 
 /* ============ SUB-HEADER ============ */
@@ -528,6 +555,14 @@ body::after {
 }
 .tag-chip[disabled] { opacity: 0.45; cursor: not-allowed; }
 
+.tag-chip--pinned {
+  background: var(--primary-dark);
+  color: #fff;
+  border-color: transparent;
+  cursor: default;
+}
+.tag-chip--pinned i { font-size: 0.68rem; }
+
 .tag-chip--custom {
   background: var(--gradient);
   color: #fff;
@@ -585,8 +620,10 @@ body::after {
   color: var(--text-muted);
 }
 .metric i { color: var(--primary-light); }
-.metric span#metricUsername, .metric span#metricTimestamp { color: var(--text); }
+.metric #metricUsername, .metric #metricTimestamp { color: var(--text); }
 
+/* Identity bar: the avatar and username are both directly clickable to
+   edit the username inline — no separate pencil icon. */
 .user-avatar {
   display: inline-flex;
   align-items: center;
@@ -594,13 +631,18 @@ body::after {
   width: 20px;
   height: 20px;
   border-radius: 50%;
+  border: none;
+  padding: 0;
   background: var(--gradient);
   color: #fff;
+  font-family: var(--font);
   font-size: 0.65rem;
   font-weight: 800;
   line-height: 1;
   flex-shrink: 0;
+  cursor: pointer;
   box-shadow: 0 0 0 1px var(--surface-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .user-avatar--anon {
   background: var(--input-bg);
@@ -608,29 +650,29 @@ body::after {
   box-shadow: 0 0 0 1px var(--surface-border) inset;
 }
 .user-avatar i { color: inherit; font-size: 0.62rem; }
+.user-avatar:hover { transform: scale(1.12); box-shadow: 0 0 0 2px var(--primary-light); }
+.user-avatar--locked { cursor: default; }
+.user-avatar--locked:hover { transform: none; box-shadow: 0 0 0 1px var(--surface-border); }
 
-.edit-username-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  margin-inline-start: 4px;
+.username-edit {
   border: none;
-  border-radius: 50%;
   background: transparent;
-  color: var(--primary-light);
-  font-size: 0.7rem;
+  padding: 0 2px;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: inherit;
+  color: var(--text);
   cursor: pointer;
-  vertical-align: middle;
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  border-radius: 4px;
+  border-bottom: 1px dashed var(--surface-border);
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
-.edit-username-btn:hover {
-  background: var(--primary);
-  color: #fff;
-  transform: scale(1.1);
+.username-edit:hover { color: var(--primary-light); border-color: var(--primary-light); }
+.username-edit--locked {
+  cursor: default;
+  border-bottom-color: transparent;
 }
-.edit-username-btn[hidden] { display: none; }
+.username-edit--locked:hover { color: var(--text); border-color: transparent; }
 
 /* Map */
 .map-card { padding-bottom: 20px; }
@@ -807,6 +849,7 @@ body::after {
   gap: 14px;
   margin-top: 4px;
 }
+.about__grid .about__item:last-child { grid-column: 1 / -1; }
 .about__item {
   display: flex;
   align-items: flex-start;

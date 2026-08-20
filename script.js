@@ -29,15 +29,19 @@
       about_step1_title: "1. Pick a wilaya",
       about_step1_body: "Choose your province from the dropdown or tap it directly on the interactive map.",
       about_step2_title: "2. Write your pulse",
-      about_step2_body: "Type your idea, event, or news update in the text field, in Arabic or English.",
-      about_step3_title: "3. Get your link",
-      about_step3_body: "A unique link is generated instantly, encoding the timestamp, wilaya, and your message.",
-      about_step4_title: "4. Share it anywhere",
-      about_step4_body: "Copy or share the link through any app — Algeria Pulse never stores your content.",
+      about_step2_body: "Type your idea, event, or news update in the text field, in Arabic or English — tap the expand icon for a bigger writing space with live counts.",
+      about_step3_title: "3. Tag it",
+      about_step3_body: "Every pulse carries the #Pulse tag by default — add a preset like Urgent or Traffic, or type your own.",
+      about_step4_title: "4. Get your link",
+      about_step4_body: "Once a wilaya, a message, and a tag are all in place, a unique link is generated instantly.",
+      about_step5_title: "5. Share it anywhere",
+      about_step5_body: "Copy the link, copy a ready-made snippet, or share it directly — Algeria Pulse never stores your content.",
       feature_privacy: "100% client-side, zero server storage",
       feature_bilingual: "Full Arabic / English support",
       feature_theme: "Light & dark Green Forest theme",
       feature_map: "Interactive 58-wilaya map",
+      feature_identity: "Tap your name or avatar to edit it",
+      feature_tags: "Preset & custom hashtags",
       about_nav_aria: "About Algeria Pulse",
       metric_user_label: "User",
       metric_time_label: "Participated",
@@ -53,6 +57,7 @@
       modal_anonymous: "Continue as Anonymous",
       anonymous_label: "Anonymous",
       new_idea_aria: "Start a new idea",
+      new_idea_fab_label: "New idea",
       feed_nav_aria: "Your local feed",
       feed_close_aria: "Close",
       feed_title: "Your local feed",
@@ -106,15 +111,19 @@
       about_step1_title: "١. اختر ولاية",
       about_step1_body: "اختر ولايتك من القائمة المنسدلة أو اضغط عليها مباشرة على الخريطة التفاعلية.",
       about_step2_title: "٢. اكتب نبضتك",
-      about_step2_body: "اكتب فكرتك أو الحدث أو الخبر في حقل النص، بالعربية أو الإنجليزية.",
-      about_step3_title: "٣. احصل على رابطك",
-      about_step3_body: "يتم إنشاء رابط فريد فورًا، يتضمن الوقت والولاية ورسالتك.",
-      about_step4_title: "٤. شاركه أينما شئت",
-      about_step4_body: "انسخ الرابط أو شاركه عبر أي تطبيق — نبض الجزائر لا يخزّن محتواك أبدًا.",
+      about_step2_body: "اكتب فكرتك أو الحدث أو الخبر في حقل النص، بالعربية أو الإنجليزية — اضغط أيقونة التوسيع لمساحة كتابة أكبر مع عدادات مباشرة.",
+      about_step3_title: "٣. أضف وسمًا",
+      about_step3_body: "تحمل كل نبضة وسم #Pulse تلقائيًا — أضف وسمًا جاهزًا مثل عاجل أو مرور، أو اكتب وسمك الخاص.",
+      about_step4_title: "٤. احصل على رابطك",
+      about_step4_body: "بمجرد اختيار الولاية وكتابة الرسالة وإضافة وسم، يتم إنشاء رابط فريد فورًا.",
+      about_step5_title: "٥. شاركه أينما شئت",
+      about_step5_body: "انسخ الرابط، انسخ مقتطفًا جاهزًا، أو شاركه مباشرة — نبض الجزائر لا يخزّن محتواك أبدًا.",
       feature_privacy: "١٠٠٪ من جهة العميل، بدون تخزين على أي خادم",
       feature_bilingual: "دعم كامل للغتين العربية والإنجليزية",
       feature_theme: "وضع فاتح وداكن بطابع الغابة الخضراء",
       feature_map: "خريطة تفاعلية لـ ٥٨ ولاية",
+      feature_identity: "اضغط على اسمك أو صورتك لتعديله",
+      feature_tags: "وسوم جاهزة وأخرى مخصصة",
       about_nav_aria: "حول نبض الجزائر",
       metric_user_label: "المستخدم",
       metric_time_label: "وقت المشاركة",
@@ -130,6 +139,7 @@
       modal_anonymous: "المتابعة كمجهول",
       anonymous_label: "مجهول",
       new_idea_aria: "بدء فكرة جديدة",
+      new_idea_fab_label: "فكرة جديدة",
       feed_nav_aria: "سجلّك المحلي",
       feed_close_aria: "إغلاق",
       feed_title: "سجلّك المحلي",
@@ -174,6 +184,12 @@
     { id: "traffic", en: "Traffic", ar: "مرور" }
   ];
 
+  // Every pulse automatically carries this branded tag — it's pinned
+  // (always active, not user-removable) and alone satisfies the "at least
+  // one tag" requirement in generateLink()'s validation gate.
+  const DEFAULT_TAG = "pulse";
+  const DEFAULT_TAG_LABEL = "Pulse";
+
   let currentLang = "en";
   let provinces = [];
   let provinceById = new Map();
@@ -184,7 +200,7 @@
   let sharedView = false;
   let sharedAuthorLabel = null;
   let sharedAuthorTimestamp = null;
-  let selectedTags = [];
+  let selectedTags = [DEFAULT_TAG];
   let sharedTags = [];
   let feedFilter = "all";
   let feedSearchTerm = "";
@@ -207,6 +223,7 @@
   // no matter which UI language a post was created or is being viewed in.
   // Only the *displayed* hashtag text is localized.
   function tagLabel(id) {
+    if (id === DEFAULT_TAG) return DEFAULT_TAG_LABEL;
     const def = TAGS.find((t) => t.id === id);
     if (!def) return id;
     return currentLang === "en" ? def.en : def.ar;
@@ -228,6 +245,16 @@
       return;
     }
 
+    // The pinned, always-on #Pulse chip — shown first, never removable.
+    const pinned = document.createElement("span");
+    pinned.className = "tag-chip tag-chip--pinned";
+    const pinnedIcon = document.createElement("i");
+    pinnedIcon.className = "fa-solid fa-thumbtack";
+    pinnedIcon.setAttribute("aria-hidden", "true");
+    pinned.appendChild(pinnedIcon);
+    pinned.appendChild(document.createTextNode(`#${DEFAULT_TAG_LABEL}`));
+    els.tagsRow.appendChild(pinned);
+
     TAGS.forEach((tagDef) => {
       const chip = document.createElement("button");
       chip.type = "button";
@@ -237,12 +264,12 @@
       els.tagsRow.appendChild(chip);
     });
 
-    // Any selected tag that isn't in the preset catalog was typed in by
-    // the user via the custom tag input — render it as its own chip with
-    // a dedicated remove control (it has no toggle state of its own).
+    // Any selected tag that isn't in the preset catalog (and isn't the
+    // pinned default) was typed in by the user via the custom tag input —
+    // render it as its own chip with a dedicated remove control.
     const catalogIds = TAGS.map((t) => t.id);
     selectedTags
-      .filter((id) => !catalogIds.includes(id))
+      .filter((id) => id !== DEFAULT_TAG && !catalogIds.includes(id))
       .forEach((id) => {
         const chip = document.createElement("span");
         chip.className = "tag-chip tag-chip--custom";
@@ -369,9 +396,8 @@
     els.usernameInput = $("#usernameInput");
     els.usernameModalTitle = $("#usernameModalTitle");
     els.usernameModalSub = $("#usernameModalSub");
-    els.editUsernameBtn = $("#editUsernameBtn");
     els.usernameAnonymousBtn = $("#usernameAnonymousBtn");
-    els.newIdeaBtn = $("#newIdeaBtn");
+    els.newIdeaFab = $("#newIdeaFab");
     els.sharedBadge = $("#sharedBadge");
     els.feedNavBtn = $("#feedNavBtn");
     els.feedModal = $("#feedModal");
@@ -438,11 +464,20 @@
       finalizeIdentity();
     });
 
-    els.editUsernameBtn.addEventListener("click", () => {
+    // Clicking the avatar or the username text itself opens the edit
+    // flow — no separate pencil icon. Both are inert while reading a
+    // shared pulse (there's no "your" identity to edit yet).
+    const openUsernameEdit = () => {
+      if (sharedView) return;
       showUsernameModal({ editing: true });
-    });
+    };
+    els.userAvatar.addEventListener("click", openUsernameEdit);
+    els.metricUsername.addEventListener("click", openUsernameEdit);
 
-    els.newIdeaBtn.addEventListener("click", startNewIdea);
+    els.newIdeaFab.addEventListener("click", () => {
+      startNewIdea();
+      if (els.textareaHome) els.textareaHome.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
 
     els.provinceSelectWrap.addEventListener("click", () => {
       if (sharedView) playLockedBeep();
@@ -673,11 +708,13 @@
   }
 
   function startNewIdea() {
+    if (els.expandModal && !els.expandModal.hidden) closeExpandModal();
+
     sharedView = false;
     sharedAuthorLabel = null;
     sharedAuthorTimestamp = null;
     sharedTags = [];
-    selectedTags = [];
+    selectedTags = [DEFAULT_TAG];
 
     els.pulseText.readOnly = false;
     els.pulseText.value = "";
@@ -773,7 +810,8 @@
       }
     }
 
-    if (els.editUsernameBtn) els.editUsernameBtn.hidden = sharedView;
+    if (els.userAvatar) els.userAvatar.classList.toggle("user-avatar--locked", sharedView);
+    if (els.metricUsername) els.metricUsername.classList.toggle("username-edit--locked", sharedView);
     if (els.sharedBadge) els.sharedBadge.hidden = !sharedView;
   }
 
@@ -1311,7 +1349,8 @@
   function generateLink() {
     const text = els.pulseText.value.trim();
     const hasIdentity = isAnonymous || !!username;
-    if (sharedView || !currentProvinceId || !text || !hasIdentity) {
+    const hasTag = selectedTags.length > 0;
+    if (sharedView || !currentProvinceId || !text || !hasIdentity || !hasTag) {
       els.outputLink.value = "";
       return;
     }

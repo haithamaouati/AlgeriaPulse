@@ -150,9 +150,6 @@
           <button id="expandTextBtn" class="icon-btn small" type="button" aria-label="Expand editor" data-i18n-aria="expand_editor_aria">
             <i class="fa-solid fa-expand" aria-hidden="true"></i>
           </button>
-          <button id="newIdeaBtn" class="icon-btn small" type="button" aria-label="Start a new idea" data-i18n-aria="new_idea_aria">
-            <i class="fa-solid fa-eraser" aria-hidden="true"></i>
-          </button>
         </div>
       </div>
       <div class="textarea-home" id="textareaHome">
@@ -176,11 +173,9 @@
       <!-- Identity bar: username + participation timestamp -->
       <div class="metrics" id="identityBar">
         <span class="metric">
-          <span class="user-avatar" id="userAvatar" aria-hidden="true"></span>
-          <span data-i18n="metric_user_label">User</span>: <span id="metricUsername">—</span>
-          <button id="editUsernameBtn" class="edit-username-btn" type="button" aria-label="Edit username" data-i18n-aria="edit_username_aria">
-            <i class="fa-solid fa-pen" aria-hidden="true"></i>
-          </button>
+          <button type="button" class="user-avatar" id="userAvatar" aria-label="Edit username" data-i18n-aria="edit_username_aria"></button>
+          <span data-i18n="metric_user_label">User</span>:
+          <button type="button" class="username-edit" id="metricUsername" aria-label="Edit username" data-i18n-aria="edit_username_aria">—</button>
         </span>
         <span class="metric"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i> <span data-i18n="metric_time_label">Participated</span>: <span id="metricTimestamp">—</span></span>
       </div>
@@ -231,21 +226,28 @@
         <i class="fa-solid fa-pen-nib about__icon" aria-hidden="true"></i>
         <div>
           <h3 data-i18n="about_step2_title">2. Write your pulse</h3>
-          <p data-i18n="about_step2_body">Type your idea, event, or news update in the text field, in Arabic or English.</p>
+          <p data-i18n="about_step2_body">Type your idea, event, or news update in the text field, in Arabic or English — tap the expand icon for a bigger writing space with live counts.</p>
+        </div>
+      </div>
+      <div class="about__item">
+        <i class="fa-solid fa-hashtag about__icon" aria-hidden="true"></i>
+        <div>
+          <h3 data-i18n="about_step3_title">3. Tag it</h3>
+          <p data-i18n="about_step3_body">Every pulse carries the #Pulse tag by default — add a preset like Urgent or Traffic, or type your own.</p>
         </div>
       </div>
       <div class="about__item">
         <i class="fa-solid fa-link about__icon" aria-hidden="true"></i>
         <div>
-          <h3 data-i18n="about_step3_title">3. Get your link</h3>
-          <p data-i18n="about_step3_body">A unique link is generated instantly, encoding the timestamp, wilaya, and your message.</p>
+          <h3 data-i18n="about_step4_title">4. Get your link</h3>
+          <p data-i18n="about_step4_body">Once a wilaya, a message, and a tag are all in place, a unique link is generated instantly.</p>
         </div>
       </div>
       <div class="about__item">
         <i class="fa-solid fa-share-nodes about__icon" aria-hidden="true"></i>
         <div>
-          <h3 data-i18n="about_step4_title">4. Share it anywhere</h3>
-          <p data-i18n="about_step4_body">Copy or share the link through any app — Algeria Pulse never stores your content.</p>
+          <h3 data-i18n="about_step5_title">5. Share it anywhere</h3>
+          <p data-i18n="about_step5_body">Copy the link, copy a ready-made snippet, or share it directly — Algeria Pulse never stores your content.</p>
         </div>
       </div>
     </div>
@@ -255,10 +257,12 @@
       <span class="about__feature"><i class="fa-solid fa-language" aria-hidden="true"></i> <span data-i18n="feature_bilingual">Full Arabic / English support</span></span>
       <span class="about__feature"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i> <span data-i18n="feature_theme">Light & dark Green Forest theme</span></span>
       <span class="about__feature"><i class="fa-solid fa-map" aria-hidden="true"></i> <span data-i18n="feature_map">Interactive 58-wilaya map</span></span>
+      <span class="about__feature"><i class="fa-solid fa-user-pen" aria-hidden="true"></i> <span data-i18n="feature_identity">Tap your name or avatar to edit it</span></span>
+      <span class="about__feature"><i class="fa-solid fa-hashtag" aria-hidden="true"></i> <span data-i18n="feature_tags">Preset & custom hashtags</span></span>
     </div>
   </section>
 
-  <p class="version" id="versionTag">Version: 2.0.0</p>
+  <p class="version" id="versionTag">Version: 2.1.0</p>
 
   <!-- ============ FOOTER ============ -->
   <footer class="footer" id="footerSection">
@@ -344,6 +348,12 @@
 
 <!-- ============ TOAST NOTIFICATIONS ============ -->
 <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ============ FLOATING "NEW IDEA" ACTION BUTTON ============ -->
+<button id="newIdeaFab" class="new-idea-fab" type="button" aria-label="Write a new idea" data-i18n-aria="new_idea_aria">
+  <i class="fa-solid fa-pen-nib" aria-hidden="true"></i>
+  <span data-i18n="new_idea_fab_label">New idea</span>
+</button>
 
 <!-- ============ FLOATING SCROLL CONTROLS ============ -->
 <div class="scroll-fab-group" aria-hidden="false">
