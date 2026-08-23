@@ -15,7 +15,8 @@
 <!-- FontAwesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="css/variables.css" />
+<link rel="stylesheet" href="css/main.css" />
 </head>
 <body>
 
@@ -160,7 +161,7 @@
 
       <!-- Smart tags -->
       <div class="tags-row" id="tagsRow" role="group" aria-label="Tags">
-        <!-- Tag chip buttons are rendered by script.js -->
+        <!-- Tag chip buttons are rendered by js/ui.js -->
       </div>
       <div class="tags-input-row" id="tagsInputRow">
         <input type="text" id="customTagInput" class="tags-input" maxlength="20"
@@ -177,7 +178,7 @@
           <span data-i18n="metric_user_label">User</span>:
           <button type="button" class="username-edit" id="metricUsername" aria-label="Edit username" data-i18n-aria="edit_username_aria">—</button>
         </span>
-        <span class="metric"><i class="fa-solid fa-stopwatch" aria-hidden="true"></i> <span data-i18n="metric_time_label">Participated</span>: <span id="metricTimestamp">—</span></span>
+        <span class="metric" id="participationMetric" hidden><i class="fa-solid fa-stopwatch" aria-hidden="true"></i> <span data-i18n="metric_time_label">Participated</span>: <span id="metricTimestamp">—</span></span>
       </div>
     </section>
 
@@ -262,7 +263,7 @@
     </div>
   </section>
 
-  <p class="version" id="versionTag">Version: 2.1.0</p>
+  <p class="version" id="versionTag">Version: 2.4.0</p>
 
   <!-- ============ FOOTER ============ -->
   <footer class="footer" id="footerSection">
@@ -369,6 +370,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 <!-- D3.js: SVG map selections, centroid math, and zoom/pan transitions -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
-<script src="script.js"></script>
+<!-- Main entry point (ES module) — imports config/audio/map/storage/ui and
+     wires everything together. type="module" defers execution until
+     after the two CDN scripts above have already run, so window.Howl and
+     window.d3 are guaranteed to exist by the time js/audio.js and
+     js/map.js need them. -->
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
