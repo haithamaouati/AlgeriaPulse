@@ -1,0 +1,60 @@
+/* =========================================================
+   Algeria Pulse — Design Tokens
+   Green Forest theme · Glassmorphism · Cairo type
+   ========================================================= */
+
+:root {
+  /* --- Green Forest palette --- */
+  --primary: #2E6F40;
+  --primary-light: #4C956C;
+  --primary-dark: #1B4332;
+  --accent: #95D5B2;
+  --accent-soft: #D8F3DC;
+
+  --gradient: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 55%, var(--primary-light) 100%);
+
+  /* --- Light mode surface tokens (overridden below for dark) --- */
+  --bg: #F1FAF4;
+  --bg-glow-1: rgba(76, 149, 108, 0.25);
+  --bg-glow-2: rgba(46, 111, 64, 0.18);
+  --text: #12271B;
+  --text-muted: #4B6455;
+  --surface: rgba(255, 255, 255, 0.55);
+  --surface-strong: rgba(255, 255, 255, 0.75);
+  --surface-border: rgba(46, 111, 64, 0.18);
+  --shadow: 0 8px 32px rgba(27, 67, 50, 0.12);
+  --input-bg: rgba(255, 255, 255, 0.65);
+
+  /* Wilaya boundary contrast — deliberately NOT the same as --bg (that was
+     the original bug that made borders vanish); see .map-container path
+     in main.css. */
+  --map-fill: #cfe8d8;
+  --map-stroke: rgba(27, 67, 50, 0.55);
+  --map-hover: #95D5B2;
+  --map-selected: #2E6F40;
+
+  --particle-color: 46, 111, 64;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --font: 'Cairo', 'Segoe UI', sans-serif;
+}
+
+[data-theme="dark"] {
+  --bg: #0B1F17;
+  --bg-glow-1: rgba(76, 149, 108, 0.22);
+  --bg-glow-2: rgba(27, 67, 50, 0.55);
+  --text: #E9F5EC;
+  --text-muted: #9CBBA9;
+  --surface: rgba(20, 41, 30, 0.55);
+  --surface-strong: rgba(20, 41, 30, 0.75);
+  --surface-border: rgba(149, 213, 178, 0.14);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --input-bg: rgba(11, 31, 23, 0.55);
+  --map-fill: #1E3B2A;
+  --map-stroke: rgba(216, 243, 220, 0.4);
+  --map-hover: #4C956C;
+  --map-selected: #95D5B2;
+  --particle-color: 149, 213, 178;
+}
